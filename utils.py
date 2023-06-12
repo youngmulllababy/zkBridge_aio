@@ -19,13 +19,13 @@ class Help:
         start_time = int(time.time())
         while True:
             current_time = int(time.time())
+            if current_time >= start_time + max_wait_time:
+                logger.info(f'{self.address} - транзакция не подтвердилась за {max_wait_time} cекунд, начинаю повторную отправку...')
+                return 0
             try:
                 status = self.w3.eth.get_transaction_receipt(tx_hash)['status']
                 if status in [0, 1]:
                     return status
-                if current_time >= start_time + max_wait_time:
-                    logger.info(f'{self.address} - транзакция не подтвердилась за {max_wait_time} cекунд, начинаю повторную отправку...')
-                    return 0
                 time.sleep(1)
             except Exception as error:
                 time.sleep(1)
@@ -274,8 +274,7 @@ class ZkBridge(Help):
                         if self.chain != 'bsc':
                             tx['gasPrice'] = self.w3.eth.gas_price
                         else:
-                            gwei = self.gwei
-                            tx['gasPrice'] = int(gwei * 10 ** 9)
+                            tx['gasPrice'] = int(self.gwei * 10 ** 9)
 
                         logger.info(f'{self.address}:{self.chain} - начинаю апрув {self.nft} {id_}...')
                         sign = self.account.sign_transaction(tx)
@@ -289,9 +288,9 @@ class ZkBridge(Help):
                             return True
                         else:
                             if self.chain == 'bsc':
-                                gwei = gwei * 1.2
-                                logger.info(f'{self.address}:{self.chain} - пробую апрувать с увеличенным газом : {gwei} gwei...')
-                                approve_nft(gwei)
+                                self.gwei = self.gwei * 1.2
+                                logger.info(f'{self.address}:{self.chain} - пробую апрувать с увеличенным газом : {self.gwei} gwei...')
+                                approve_nft(self.gwei)
 
                     except Exception as e:
                         error = str(e)
@@ -331,8 +330,7 @@ class ZkBridge(Help):
                     if self.chain != 'bsc':
                         tx['gasPrice'] = self.w3.eth.gas_price
                     else:
-                        gwei = self.gwei
-                        tx['gasPrice'] = int(gwei * 10 ** 9)
+                        tx['gasPrice'] = int(self.gwei * 10 ** 9)
 
                     sign = self.account.sign_transaction(tx)
                     hash = self.w3.eth.send_raw_transaction(sign.rawTransaction)
@@ -345,9 +343,9 @@ class ZkBridge(Help):
                         return self.w3.to_hex(hash), session, id_
                     else:
                         if self.chain == 'bsc':
-                            gwei = gwei * 1.2
-                            logger.info(f'{self.address}:{self.chain} - пробую бриджить с увеличенным газом : {gwei} gwei...')
-                            bridge_(gwei)
+                            self.gwei = self.gwei * 1.2
+                            logger.info(f'{self.address}:{self.chain} - пробую бриджить с увеличенным газом : {self.gwei} gwei...')
+                            bridge_(self.gwei)
 
                 except Exception as e:
                     error = str(e)
@@ -739,9 +737,9 @@ class ZkMessage(Help):
                         return self.address, 'success'
                 else:
                     if self.chain == 'bsc':
-                        gwei = self.gwei * 1.2
-                        logger.info(f'{self.address}:{self.chain} - пробую бриджить с увеличенным газом : {gwei} gwei...')
-                        self.send_msg(gwei)
+                        self.gwei = self.gwei * 1.2
+                        logger.info(f'{self.address}:{self.chain} - пробую отправлять сообщение с увеличенным газом : {self.gwei} gwei...')
+                        self.send_msg(self.gwei)
 
             except Exception as e:
                 error = str(e)
