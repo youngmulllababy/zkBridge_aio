@@ -10,7 +10,7 @@
 
 * Прокси в proxyy.txt - один прокси на одной строке  в формате http://login:pass@ip:port</br>
 
-*http://login:pass@ip:port</br>
+* http://login:pass@ip:port</br>
 
 * Необходим апи ключ моралис - https://admin.moralis.io/settings#secret-keys
  </br>
