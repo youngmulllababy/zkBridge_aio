@@ -43,7 +43,7 @@ gwei = 1.5
     zkLightClient   -   сhain - bsc, polygon  to - bsc, polygon
     Mainnet Alpha   -   сhain - bsc  to - polygon 
     Luban   -   сhain - polygon  to - bsc
-
+    
     TYPE - messenger / nftbridger (выбираете свой тип)
     
     MODE 0/1   1 (режим минта & бриджа) / 0 (режим бриджа УЖЕ ЗАБРИДЖЕННЫХ КОГДА ТО НФТ)
@@ -51,9 +51,10 @@ gwei = 1.5
     NFT - ВЫБОР НАЗВАНИЯ НФТ
 '''
 
-TYPE = 'messenger' # 'messenger' / 'nftbridger'
+TYPE = 'messenger'   # 'messenger' / 'nftbridger'
+#chains - bsc / polygon / ftm
 chain = 'bsc'
 to = 'polygon'
-MODE = 1  #mode 1 - mint&bridge 0 - bridge already minted nfts
+MODE = 1   #mode 1 - mint&bridge 0 - bridge already minted nfts
 
 nft = 'Luban'  #'greenfield' 'zkLightClient' 'Mainnet Alpha' 'Luban' /  random.choice['greenfield','zkLightClient','Mainnet Alpha','Luban']  - random nft
