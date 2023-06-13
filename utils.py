@@ -24,7 +24,7 @@ class Help:
                 return 0
             try:
                 status = self.w3.eth.get_transaction_receipt(tx_hash)['status']
-                if status in [0, 1]:
+                if status == 1:
                     return status
                 time.sleep(1)
             except Exception as error:
@@ -207,8 +207,7 @@ class ZkBridge(Help):
                     if self.chain != 'bsc':
                         tx['gasPrice'] = self.w3.eth.gas_price
                     else:
-                        gwei = self.gwei
-                        tx['gasPrice'] = int(gwei * 10 ** 9)
+                        tx['gasPrice'] = int(self.gwei * 10 ** 9)
 
                     logger.info(f'{self.address}:{self.chain} - начинаю минт {self.nft}...')
                     sign = self.account.sign_transaction(tx)
@@ -220,16 +219,19 @@ class ZkBridge(Help):
                         self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
                         return session
                     else:
-                        gwei = gwei*1.2
-                        logger.info(f'{self.address}:{self.chain} - пробую минтить с увеличенным газом : {gwei} gwei...')
-                        self.mint(gwei)
+                        self.gwei = self.gwei*1.2
+                        logger.info(f'{self.address}:{self.chain} - пробую минтить с увеличенным газом : {self.gwei} gwei...')
+                        self.mint(self.gwei)
             except Exception as e:
                 error = str(e)
                 if 'nonce too low' in error or 'already known' in error:
-                    logger.success(f'{self.address}:{self.chain} -успешно заминтил {self.nft}')
-                    self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
-                    return session
-                elif 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
+                    logger.success(f'{self.address}:{self.chain} - ошибка при минте, пробую еще раз...')
+                    time.sleep(10)
+                    if self.chain == 'bsc':
+                        self.gwei = self.gwei*1.2
+                        print(self.gwei)
+                        self.mint(self.gwei)
+                if 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
                     logger.error(f'{self.address}:{self.chain} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
                     time.sleep(5)
                     return False
@@ -292,16 +294,19 @@ class ZkBridge(Help):
                             return True
                         else:
                             if self.chain == 'bsc':
-                                self.gwei = self.gwei * 1.2
+                                self.gwei = int(self.gwei * 1.2)
                                 logger.info(f'{self.address}:{self.chain} - пробую апрувать с увеличенным газом : {self.gwei} gwei...')
                                 approve_nft(self.gwei)
 
                     except Exception as e:
                         error = str(e)
                         if 'nonce too low' in error or 'already known' in error:
-                            logger.success(f'{self.address}:{self.chain} - успешно апрувнул {self.nft} {id_}...')
-                            self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
-                            return True
+                            logger.info(f'{self.address}:{self.chain} - ошибка при апруве, пробую еще раз...')
+                            time.sleep(10)
+                            if self.chain == 'bsc':
+                                self.gwei = self.gwei * 1.2
+                                print(self.gwei)
+                                approve_nft(self.gwei)
                         if 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
                             logger.error(
                                 f'{self.address}:{self.chain} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
