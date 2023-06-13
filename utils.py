@@ -6,11 +6,11 @@ from fake_useragent import UserAgent
 from loguru import logger
 from eth_account.messages import encode_defunct
 from tqdm import tqdm
-from moralis import evm_api
 import pandas as pd
 from info import *
 from config import *
 from eth_utils import *
+from moralis import evm_api
 
 class Help:
     def check_status_tx(self,tx_hash,):
@@ -178,7 +178,6 @@ class ZkBridge(Help):
             if id_:
                 logger.success(f'{self.address}:{self.chain} - успешно найдена {self.nft} {id_}...')
                 return id_
-
         except Exception as e:
             if 'list index out of range' in str(e):
                 logger.error(f'{self.address}:{self.chain} - на кошельке отсутсвует {self.nft}...')
@@ -226,11 +225,15 @@ class ZkBridge(Help):
                         self.mint(gwei)
             except Exception as e:
                 error = str(e)
-                if 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
+                if 'nonce too low' in error or 'already known' in error:
+                    logger.success(f'{self.address}:{self.chain} -успешно заминтил {self.nft}')
+                    self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
+                    return session
+                elif 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
                     logger.error(f'{self.address}:{self.chain} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
                     time.sleep(5)
                     return False
-                if 'Each address may claim one NFT only. You have claimed already' in error:
+                elif 'Each address may claim one NFT only. You have claimed already' in error:
                     logger.error(f'{self.address}:{self.chain} - {self.nft} можно клеймить только один раз!...')
                     return False
                 else:
@@ -240,6 +243,7 @@ class ZkBridge(Help):
         if self.mode == 1: #mode 1 - mint&bridge  /  mode 0 - find nft and bridge
             session = self.mint()
             if session:
+                time.sleep(5)
                 id_ = self.balance_and_get_id()
                 pass
             else:
@@ -294,6 +298,10 @@ class ZkBridge(Help):
 
                     except Exception as e:
                         error = str(e)
+                        if 'nonce too low' in error or 'already known' in error:
+                            logger.success(f'{self.address}:{self.chain} - успешно апрувнул {self.nft} {id_}...')
+                            self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
+                            return True
                         if 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
                             logger.error(
                                 f'{self.address}:{self.chain} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
@@ -499,11 +507,12 @@ class ZkBridge(Help):
                 self.sleep_indicator(10)
                 if status == 1:
                     logger.success(f'{address}:{self.to} - успешно заклеймил {self.nft} : {scans[self.to]}{w3.to_hex(hash)}...')
-                    self.sleep_indicator(random.randint(1, 20))  # delay
                     order = self.claimOrder(session, id_, block_hash)
                     if order:
+                        self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
                         return address, 'success'
                     else:
+                        self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
                         return address, 'error'
                 else:
                     gasPrice = gasPrice * 1.2
@@ -517,13 +526,20 @@ class ZkBridge(Help):
                     tt = random.randint(20,60)
                     logger.info(f'{address}:{self.to} - cплю {tt} секунд...')
                     self.sleep_indicator(tt)
+                elif 'nonce too low' in error or 'already known' in error or 'Message already executed' in error:
+                    logger.success(f'{self.address}:{self.to} - успешно заклеймил {self.nft}...')
+                    self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
+                    order = self.claimOrder(session, id_, block_hash)
+                    if order:
+                        self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
+                        return address, 'success'
+                    else:
+                        self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
+                        return address, 'error'
                 elif 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
                     logger.error(f'{self.address}:{self.to} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
                     time.sleep(5)
                     return address, 'error'
-                elif 'Message already executed' in error:
-                    logger.success(f'{self.address}:{self.to} - успешно заклеймил {self.nft}...')
-                    return address, 'success'
                 else:
                     logger.error(f'{address}:{self.to} - {e} ...')
                     return address, 'error'
@@ -743,7 +759,14 @@ class ZkMessage(Help):
 
             except Exception as e:
                 error = str(e)
-                if 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
+                if 'nonce too low' in error or 'already known' in error or 'Message already executed' in error:
+                    logger.success(f'{self.address}:{self.chain} - успешно отправил сообщение {message} в {self.to}...')
+                    time.sleep(5)
+                    msg = self.msg(session, contract_msg, message, from_chain_id, to_chain_id, self.w3.to_hex(hash))
+                    if msg:
+                        self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
+                        return self.address, 'success'
+                elif 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
                     logger.error(f'{self.address}:{self.chain} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
                     time.sleep(5)
                     return self.address, 'error'
