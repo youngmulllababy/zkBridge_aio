@@ -19,8 +19,8 @@ with open("proxyy.txt", "r") as f:
 with open("hashes.txt", "r") as f:
     hashes_ = [row.strip() for row in f]
 
-rpcs = {'bsc': '',
-        'polygon': ''}
+rpcs = {'bsc': 'https://bscrpc.com',
+        'polygon': 'https://polygon.llamarpc.com	'}
 
 
 DELAY = (0, 100)
@@ -60,7 +60,7 @@ max_wait_time = 250
     NFT - ВЫБОР НАЗВАНИЯ НФТ
 '''
 
-TYPE = 'nftbridger'   # 'messenger' / 'nftbridger' / 'claimer'
+TYPE = 'messenger'   # 'messenger' / 'nftbridger' / 'claimer'
 #chains - bsc / polygon / ftm
 chain = 'bsc'
 to = 'polygon'
