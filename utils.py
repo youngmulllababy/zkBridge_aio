@@ -230,14 +230,12 @@ class ZkBridge(Help):
                     logger.error(f'{self.address}:{self.chain} - {e}...')
                     return False
     def bridge_nft(self):
-        if self.mode == 1: #mode 1 - mint&bridge  /  mode 0 - find nft and bridge
+        if self.mode == 1:
+            id_ = self.balance_and_get_id()
             session = self.mint()
             if session:
                 time.sleep(5)
                 id_ = self.balance_and_get_id()
-                pass
-            else:
-                return False
         else:
             session = self.profile()
             id_ = self.balance_and_get_id()
