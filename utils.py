@@ -14,7 +14,7 @@ from moralis import evm_api
 
 class Help:
     def check_status_tx(self,tx_hash,):
-        logger.info(f'{self.address} - жду подтверждения транзакции...')
+        logger.info(f'{self.address} - жду подтверждения транзакции  {scans[self.chain]}{self.w3.to_hex(tx_hash)}...')
 
         start_time = int(time.time())
         while True:
@@ -45,9 +45,8 @@ class ZkBridge(Help):
         self.delay = delay
         self.proxy = proxy
         self.mode = mode
-        self.gwei = gwei
         self.moralisapi = api
-        self.nft_address = nfts_addresses[self.nft][self.chain] if self.mode == 1 else reversed_nfts_addresses[self.nft][self.chain]
+        self.nft_address = nfts_addresses[self.nft][self.chain] if self.mode == 1 else reversed_nfts_addresses[self.nft][self.chain] if self.mode == 0 else ''
         self.bridge_address = nft_bridge_addresses[self.chain]
     def auth(self):
         ua = UserAgent()
@@ -71,7 +70,6 @@ class ZkBridge(Help):
         json_data = {
             'publicKey': self.address.lower(),
         }
-
         while True:
             try:
                 if self.proxy:
@@ -89,7 +87,6 @@ class ZkBridge(Help):
 
                 if response.status_code == 200:
                     msg = json.loads(response.text)
-
                     msg = msg['message']
                     msg = encode_defunct(text=msg)
                     sign = self.w3.eth.account.sign_message(msg, private_key=self.privatekey)
@@ -103,7 +100,6 @@ class ZkBridge(Help):
                 logger.error(f'{self.address}:{self.chain} - {e}')
                 time.sleep(5)
     def sign(self):
-
         # sign msg
         signature, ua = self.auth()
         headers = {
@@ -184,10 +180,12 @@ class ZkBridge(Help):
                 return None
             else:
                 logger.error(f'{self.address}:{self.chain} - {e}...')
+    def add_hash_and_address(self,hash_):
+        with open("hashes.txt", "w") as file:
+            file.write(f"{self.privatekey}:{hash_}\n")
     def mint(self, gwei=None):
         while True:
-            zkNft = self.w3.eth.contract(
-                address=Web3.to_checksum_address(self.nft_address), abi=zk_nft_abi)
+            zkNft = self.w3.eth.contract(address=Web3.to_checksum_address(self.nft_address), abi=zk_nft_abi)
 
             session = self.profile()
             if not session:
@@ -203,12 +201,6 @@ class ZkBridge(Help):
                         'nonce': nonce,
                         'gasPrice': self.w3.eth.gas_price
                     })
-
-                    if self.chain != 'bsc':
-                        tx['gasPrice'] = self.w3.eth.gas_price
-                    else:
-                        tx['gasPrice'] = int(self.gwei * 10 ** 9)
-
                     logger.info(f'{self.address}:{self.chain} - начинаю минт {self.nft}...')
                     sign = self.account.sign_transaction(tx)
                     hash = self.w3.eth.send_raw_transaction(sign.rawTransaction)
@@ -219,18 +211,14 @@ class ZkBridge(Help):
                         self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
                         return session
                     else:
-                        self.gwei = self.gwei*1.2
-                        logger.info(f'{self.address}:{self.chain} - пробую минтить с увеличенным газом : {self.gwei} gwei...')
-                        self.mint(self.gwei)
+                        logger.info(f'{self.address}:{self.chain} - пробую минт еще раз...')
+                        self.mint()
             except Exception as e:
                 error = str(e)
                 if 'nonce too low' in error or 'already known' in error:
                     logger.success(f'{self.address}:{self.chain} - ошибка при минте, пробую еще раз...')
                     time.sleep(10)
-                    if self.chain == 'bsc':
-                        self.gwei = self.gwei*1.2
-                        print(self.gwei)
-                        self.mint(self.gwei)
+                    self.mint()
                 if 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
                     logger.error(f'{self.address}:{self.chain} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
                     time.sleep(5)
@@ -270,18 +258,11 @@ class ZkBridge(Help):
                             Web3.to_checksum_address(self.bridge_address), id_).build_transaction({
                             'from': self.address,
                             'gas': zkNft.functions.approve(Web3.to_checksum_address(self.bridge_address),
-                                                           id_).estimate_gas(
-                                {'from': self.address, 'nonce': nonce}),
+                                                           id_).estimate_gas({'from': self.address, 'nonce': nonce}),
                             'nonce': nonce,
                             'gasPrice': self.w3.eth.gas_price
 
                         })
-
-                        if self.chain != 'bsc':
-                            tx['gasPrice'] = self.w3.eth.gas_price
-                        else:
-                            tx['gasPrice'] = int(self.gwei * 10 ** 9)
-
                         logger.info(f'{self.address}:{self.chain} - начинаю апрув {self.nft} {id_}...')
                         sign = self.account.sign_transaction(tx)
                         hash = self.w3.eth.send_raw_transaction(sign.rawTransaction)
@@ -293,20 +274,13 @@ class ZkBridge(Help):
                             self.sleep_indicator(random.randint(1, 10))
                             return True
                         else:
-                            if self.chain == 'bsc':
-                                self.gwei = int(self.gwei * 1.2)
-                                logger.info(f'{self.address}:{self.chain} - пробую апрувать с увеличенным газом : {self.gwei} gwei...')
-                                approve_nft(self.gwei)
-
+                            logger.info(f'{self.address}:{self.chain} - пробую апрув еще раз...')
+                            approve_nft()
                     except Exception as e:
                         error = str(e)
                         if 'nonce too low' in error or 'already known' in error:
                             logger.info(f'{self.address}:{self.chain} - ошибка при апруве, пробую еще раз...')
-                            time.sleep(10)
-                            if self.chain == 'bsc':
-                                self.gwei = self.gwei * 1.2
-                                print(self.gwei)
-                                approve_nft(self.gwei)
+                            approve_nft()
                         if 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
                             logger.error(
                                 f'{self.address}:{self.chain} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
@@ -317,7 +291,7 @@ class ZkBridge(Help):
                             time.sleep(2)
                             return False
 
-        def bridge_(gwei=None):
+        def bridge_():
             bridge = self.w3.eth.contract(address=Web3.to_checksum_address(self.bridge_address), abi=bridge_abi)
             to = chain_ids[self.to]
             fee = bridge.functions.fee(to).call()
@@ -334,16 +308,10 @@ class ZkBridge(Help):
                         'value': fee,
                         'gas': bridge.functions.transferNFT(
                             Web3.to_checksum_address(self.nft_address), id_, to,
-                            enco).estimate_gas(
-                            {'from': self.address, 'nonce': nonce, 'value': fee}),
+                            enco).estimate_gas({'from': self.address, 'nonce': nonce, 'value': fee}),
                         'nonce': nonce,
                         'gasPrice': self.w3.eth.gas_price
                     })
-
-                    if self.chain != 'bsc':
-                        tx['gasPrice'] = self.w3.eth.gas_price
-                    else:
-                        tx['gasPrice'] = int(self.gwei * 10 ** 9)
 
                     sign = self.account.sign_transaction(tx)
                     hash = self.w3.eth.send_raw_transaction(sign.rawTransaction)
@@ -355,24 +323,21 @@ class ZkBridge(Help):
                         self.sleep_indicator(random.randint(1, 20))
                         return self.w3.to_hex(hash), session, id_
                     else:
-                        if self.chain == 'bsc':
-                            self.gwei = self.gwei * 1.2
-                            logger.info(f'{self.address}:{self.chain} - пробую бриджить с увеличенным газом : {self.gwei} gwei...')
-                            bridge_(self.gwei)
-
+                        logger.info(f'{self.address}:{self.chain} - пробую бриджить еще раз...')
+                        bridge_()
                 except Exception as e:
                     error = str(e)
                     if 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
-                        logger.error(
-                            f'{self.address}:{self.chain} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
+                        logger.error(f'{self.address}:{self.chain} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
                         time.sleep(5)
                         return False
                     else:
                         logger.error(f'{self.address}:{self.chain} - {e}')
                         return False
-
         if approve_nft(self):
             return bridge_()
+        else:
+            return False
     def go_requests(self, hash, session, nft_id):
         def create_order():
             json_data = {
@@ -424,7 +389,7 @@ class ZkBridge(Help):
                         response = session.post('https://api.zkbridge.com/api/v2/receipt_proof/generate', json=json_data)
                     if response.status_code == 200:
                         data_ = json.loads(response.text)
-                        logger.success(f'{self.address} - сгенерирован blob...')
+                        logger.success(f'{self.address} - сгенерирован blob для клейма...')
                         return data_, id_, session
 
                 except Exception as e:
@@ -440,8 +405,7 @@ class ZkBridge(Help):
             try:
                 if self.proxy:
                     proxies = {'http': self.proxy, 'https': self.proxy}
-                    response = session.post('https://api.zkbridge.com/api/bridge/claimOrder', json=json_data,
-                                            proxies=proxies)
+                    response = session.post('https://api.zkbridge.com/api/bridge/claimOrder', json=json_data, proxies=proxies)
                 else:
                     response = session.post('https://api.zkbridge.com/api/bridge/claimOrder', json=json_data)
                 if response.status_code == 200:
@@ -450,10 +414,10 @@ class ZkBridge(Help):
                     return True
 
             except Exception as e:
-                logger.error(f'{self.address}:{self.to}- {e}')
+                logger.error(f'{self.address}:{self.to} - {e}')
                 time.sleep(5)
-    def check_status_tx2(self, w3, tx_hash, ):
-        logger.info(f'{self.address} - жду подтверждения транзакции...')
+    def check_status_tx2(self, w3, tx_hash):
+        logger.info(f'{self.address} - жду подтверждения транзакции {scans[self.to]}{w3.to_hex(tx_hash)}...')
         start_time = int(time.time())
         while True:
             current_time = int(time.time())
@@ -468,12 +432,136 @@ class ZkBridge(Help):
                 time.sleep(1)
             except Exception as error:
                 time.sleep(1)
-    def claim_on_destinaton(self, gasPrice=None):
-        if self.to == 'bsc':
-            rpc = 'https://bscrpc.com'
-        else:
-            rpc = rpcs[self.to]
-        w3 = Web3(Web3.HTTPProvider(rpc))
+    def redeem_nft(self,session=None,hash_=None):
+        self.add_hash_and_address(123)
+        if self.mode == 2:
+            data = self.profile()
+            if data:
+                session = data
+            else:
+                return self.address,f'error + {hash_}'
+        def get_order_by_hash():
+            logger.info(f'{self.address}:{self.to} - пробую делать redeem {self.nft} в сети назначения...')
+            while True:
+                params = {
+                    'depositHash': hash_,
+                    'sourceChainId': ids[self.chain],
+                }
+                try:
+                    if self.proxy:
+                        proxies = {'http': self.proxy, 'https': self.proxy}
+                        response = session.get('https://api.zkbridge.com/api/bridge/getOrderByDepositHashAndChainId', params=params, proxies=proxies)
+                    else:
+                        response = session.get('https://api.zkbridge.com/api/bridge/getOrderByDepositHashAndChainId', params=params)
+
+                    if response.status_code == 200:
+                        data = json.loads(response.text)
+                        if data['message'] == 'success':
+                            id_ = data['data']['id']
+                            logger.success(f'{self.address} - успешно нашел информацию для клейма {self.nft} в сети назначения...')
+                            time.sleep(5)
+                            return id_
+
+                except Exception as e:
+                    logger.error(f'{self.address}:{self.to} - {e}')
+                    time.sleep(5)
+
+        def gen_blob():
+            data = get_order_by_hash()
+            if data:
+                id_ = data
+            else:
+                return False
+            json_data = {
+                'tx_hash': hash_,
+                'chain_id': chain_ids[self.chain],
+                'testnet': False,
+            }
+            while True:
+                try:
+                    if self.proxy:
+                        proxies = {'http': self.proxy, 'https': self.proxy}
+                        response = session.post('https://api.zkbridge.com/api/v2/receipt_proof/generate', json=json_data,
+                                                proxies=proxies)
+                    else:
+                        response = session.post('https://api.zkbridge.com/api/v2/receipt_proof/generate', json=json_data)
+                    if response.status_code == 200:
+                        data_ = json.loads(response.text)
+                        logger.success(f'{self.address} - сгенерирован blob для клейма {self.nft}...')
+                        time.sleep(5)
+                        return data_, id_, session
+
+                except Exception as e:
+                    logger.error(f'{self.address}:{self.to} - {e}')
+                    time.sleep(5)
+
+        def claim_again():
+            w3 = Web3(Web3.HTTPProvider(rpcs[self.to]))
+            account = w3.eth.account.from_key(self.privatekey)
+            address = account.address
+            claim = w3.eth.contract(address=Web3.to_checksum_address(nft_claim_addresses[self.to]), abi=zk_claim_abi)
+            while True:
+                data = gen_blob()
+                if data:
+                    data_, id_, session = data
+                else:
+                    return address, False
+                cid = data_['chain_id']
+                proof = data_['proof_index']
+                blob = data_['proof_blob']
+                block_hash = data_['block_hash']
+                try:
+                    nonce = w3.eth.get_transaction_count(address)
+                    time.sleep(2)
+                    gasPrice = w3.eth.gas_price
+                    tx = claim.functions.validateTransactionProof(cid, to_bytes(hexstr=block_hash), proof,
+                                                                  to_bytes(hexstr=blob)).build_transaction({
+                        'from': address,
+                        'gas': claim.functions.validateTransactionProof(cid, to_bytes(hexstr=block_hash), proof,
+                                                                        to_bytes(hexstr=blob)).estimate_gas({'from': address, 'nonce': nonce}),
+                        'nonce': nonce,
+                        'gasPrice': gasPrice
+                    })
+                    sign = account.sign_transaction(tx)
+                    hash = w3.eth.send_raw_transaction(sign.rawTransaction)
+                    status = self.check_status_tx2(w3, hash)
+                    self.sleep_indicator(10)
+                    if status == 1:
+                        logger.success(f'{address}:{self.to} - успешно заклеймил {self.nft} : {scans[self.to]}{w3.to_hex(hash)}...')
+                        order = self.claimOrder(session, id_, block_hash)
+                        if order:
+                            self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
+                            return address, 'success'
+                        else:
+                            self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
+                            self.add_hash_and_address(hash_)
+                            return address, 'error'
+                    else:
+                        logger.info(f'{self.address}:{self.chain} - пробую клеймить еще раз...')
+                        claim_again()
+
+                except Exception as e:
+                    error = str(e)
+                    if 'execution reverted: Block Header is not set' in error:
+                        logger.info(f'{address}:{self.to} - {self.to} лагает, пробую еще раз...')
+                        tt = random.randint(20, 60)
+                        logger.info(f'{address}:{self.to} - cплю {tt} секунд...')
+                        self.sleep_indicator(tt)
+                    elif 'nonce too low' in error or 'already known' in error or 'Message already executed' in error:
+                        logger.success(f'{self.address}:{self.to} - пробую клеймить еще раз...')
+                        claim_again()
+                    elif 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
+                        logger.error(f'{self.address}:{self.to} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
+                        time.sleep(5)
+                        self.add_hash_and_address(hash_)
+                        return address, f'error {hash_}'
+                    else:
+                        logger.error(f'{address}:{self.to} - {e} ...')
+                        self.add_hash_and_address(hash_)
+                        return address, f'error {hash_}'
+        claim_again()
+    def claim_on_destinaton(self):
+        w3 = Web3(Web3.HTTPProvider(rpcs[self.to]))
         account = w3.eth.account.from_key(self.privatekey)
         address = account.address
         claim = w3.eth.contract(address=Web3.to_checksum_address(nft_claim_addresses[self.to]),abi=zk_claim_abi)
@@ -505,7 +593,6 @@ class ZkBridge(Help):
                     'nonce': nonce,
                     'gasPrice': gasPrice
                 })
-
                 sign = account.sign_transaction(tx)
                 hash = w3.eth.send_raw_transaction(sign.rawTransaction)
                 status = self.check_status_tx2(w3, hash)
@@ -518,11 +605,11 @@ class ZkBridge(Help):
                         return address, 'success'
                     else:
                         self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
+                        self.add_hash_and_address(hash_)
                         return address, 'error'
                 else:
-                    gasPrice = gasPrice * 1.2
-                    logger.info( f'{self.address}:{self.chain} - пробую клеймить с увеличенным газом : {gasPrice/10**9} gwei...')
-                    self.claim_on_destinaton(gasPrice)
+                    logger.info(f'{self.address}:{self.chain} - пробую клеймить через redeem еще раз...')
+                    self.redeem_nft(session,hash_)
 
             except Exception as e:
                 error = str(e)
@@ -540,14 +627,15 @@ class ZkBridge(Help):
                         return address, 'success'
                     else:
                         self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
-                        return address, 'error'
+                        return address, f'error {hash_}'
                 elif 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
                     logger.error(f'{self.address}:{self.to} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
                     time.sleep(5)
-                    return address, 'error'
+                    self.add_hash_and_address(hash_)
+                    return address, f'error {hash_}'
                 else:
                     logger.error(f'{address}:{self.to} - {e} ...')
-                    return address, 'error'
+                    self.redeem_nft(session, hash_)
 
 class ZkMessage(Help):
     def __init__(self, privatekey, chain, to, delay, proxy=None):
@@ -559,7 +647,6 @@ class ZkMessage(Help):
         self.account = self.w3.eth.account.from_key(self.privatekey)
         self.address = self.account.address
         self.delay = delay
-        self.gwei = gwei
         self.proxy = proxy
     def auth(self):
         ua = UserAgent()
@@ -714,7 +801,7 @@ class ZkMessage(Help):
 
         msg = ' '.join(string)
         return msg
-    def send_msg(self,gwei=None):
+    def send_msg(self):
         data = self.profile()
         if data:
             session = data
@@ -739,11 +826,6 @@ class ZkMessage(Help):
                     'gasPrice': self.w3.eth.gas_price
                 })
 
-                if self.chain != 'bsc':
-                    tx['gasPrice'] = self.w3.eth.gas_price
-                else:
-                    tx['gasPrice'] = int(self.gwei * 10 ** 9)
-
                 logger.info(f'{self.address}:{self.chain} - начинаю отправку сообщения в {self.to}...')
                 sign = self.account.sign_transaction(tx)
                 hash = self.w3.eth.send_raw_transaction(sign.rawTransaction)
@@ -757,20 +839,14 @@ class ZkMessage(Help):
                         self.sleep_indicator(random.randint(self.delay[0],self.delay[1]))
                         return self.address, 'success'
                 else:
-                    if self.chain == 'bsc':
-                        self.gwei = self.gwei * 1.2
-                        logger.info(f'{self.address}:{self.chain} - пробую отправлять сообщение с увеличенным газом : {self.gwei} gwei...')
-                        self.send_msg(self.gwei)
+                    logger.info(f'{self.address}:{self.chain} - пробую еще раз отправлять сообщение...')
+                    self.send_msg()
 
             except Exception as e:
                 error = str(e)
                 if 'nonce too low' in error or 'already known' in error or 'Message already executed' in error:
-                    logger.success(f'{self.address}:{self.chain} - успешно отправил сообщение {message} в {self.to}...')
                     time.sleep(5)
-                    msg = self.msg(session, contract_msg, message, from_chain_id, to_chain_id, self.w3.to_hex(hash))
-                    if msg:
-                        self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
-                        return self.address, 'success'
+
                 elif 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
                     logger.error(f'{self.address}:{self.chain} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
                     time.sleep(5)

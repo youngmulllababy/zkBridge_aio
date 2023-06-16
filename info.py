@@ -14,8 +14,6 @@ chain_ids = {'bsc': 3,
 ids = {'bsc':56,
         'polygon':137}
 
-rpcs = {'bsc': 'https://rpc.ankr.com/bsc',
-        'polygon': 'https://polygon.llamarpc.com'}
 
 scans = {'bsc':'https://bscscan.com/tx/',
          'polygon':'https://polygonscan.com/tx/'}
@@ -49,7 +47,3 @@ reversed_nfts_addresses = {'greenfield':{'polygon':"0x25B2e530F4bAbfE6831B7f0801
                  'zkLightClient':{'bsc':'0x3FA9B338B6e5c5F433AA7E87250cC18808D120Fd','polygon':'0x20a4dFCe37388a6f5a713389f079B333EC27F7D1'}, #first mint #0x3FA9B338B6e5c5F433AA7E87250cC18808D120Fd
                  'Mainnet Alpha':{'bsc':'0x9194EDA0BDe962A013B890184e212462650FEe8a'},
                 'Luban':{'polygon':'0x952Ba02590b50e2e80801F27a2417aB05eFE564b'}}
-
-
-
-
