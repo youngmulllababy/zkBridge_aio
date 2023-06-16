@@ -233,16 +233,15 @@ class ZkBridge(Help):
         if self.mode == 1:
             id_ = self.balance_and_get_id()
             session = self.profile()
-            session = self.mint()
-            if session:
-                time.sleep(5)
-                id_ = self.balance_and_get_id()
+            if id_ == None:
+                session = self.mint()
+                if session:
+                    time.sleep(5)
+                    id_ = self.balance_and_get_id()
         else:
             session = self.profile()
             id_ = self.balance_and_get_id()
 
-        if id_ == None:
-            return False
 
         zkNft = self.w3.eth.contract(address=Web3.to_checksum_address(self.nft_address), abi=zk_nft_abi)
 
