@@ -232,6 +232,7 @@ class ZkBridge(Help):
     def bridge_nft(self):
         if self.mode == 1:
             id_ = self.balance_and_get_id()
+            session = self.profile()
             session = self.mint()
             if session:
                 time.sleep(5)
