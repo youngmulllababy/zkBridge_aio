@@ -5,45 +5,63 @@ zk_claim_abi = '[{"anonymous":false,"inputs":[{"indexed":false,"internalType":"a
 
 stargate_ids = {'bsc': 102,
                 'polygon': 109,
-                'ftm': 112}
+                'ftm': 112,
+                'nova': 175,
+                'mbeam': 126}
 
 chain_ids = {'bsc': 3,
-            'polygon': 4,
-            'ftm': 6}
+             'polygon': 4,
+             'ftm': 6,
+             'core': 17,
+             'mbeam': 9,
+             'nova': 14}
 
-ids = {'bsc':56,
-        'polygon':137}
+ids = {'bsc': 56,
+       'polygon': 137,
+       'core': 1116}
 
-
-scans = {'bsc':'https://bscscan.com/tx/',
-         'polygon':'https://polygonscan.com/tx/'}
+scans = {'bsc': 'https://bscscan.com/tx/',
+         'polygon': 'https://polygonscan.com/tx/',
+         'core': 'https://scan.coredao.org/tx/'}
 
 dst_addresses = {'bsc': '0xA98163227B85CcC765295Ce5C18E8aAD663De147',
-                'polygon': '0xCcE1E39f2Ef1e69E6B61Cf79212E96C92C4aFf9a',
-                'ftm': '0xfCF250b621872aceB9C0BB78AACe1F1cFc5820b1'}
+                 'polygon': '0xCcE1E39f2Ef1e69E6B61Cf79212E96C92C4aFf9a',
+                 'ftm': '0xfCF250b621872aceB9C0BB78AACe1F1cFc5820b1',
+                 'nova': '0x52c491c2afdA8b6FB361404213122644D98e0AA0',
+                 'mbeam': '0xAf83500eA01d098F4FEBE94d54a5Dc51C41e46eD'}
 
 lzdst_addresses = {'bsc': '0x39dad2E89a213626a99Ae09b808b4A79c0d3EC16',
-                'polygon': '0x2647D579ebc9e1eC5e01c32030d8e69e4a678dEB',
-                'ftm': '0x59a90C88C899338F6b3E9a94CDB1047FD0b41149'}
+                   'polygon': '0x2647D579ebc9e1eC5e01c32030d8e69e4a678dEB',
+                   'ftm': '0x59a90C88C899338F6b3E9a94CDB1047FD0b41149',
+                   'nova': '0x2dED59F685f18ee016a93d1CeCc5b7eA0322aFED',
+                   'mbeam': '0xe6eb0b3A1b0c542aCCB40a86565786Fcf8a42EF0'}
 
 nft_bridge_addresses = {'bsc': '0xE09828f0DA805523878Be66EA2a70240d312001e',
-                'polygon': '0x2E953a70C37E8CB4553DAe1F5760128237c8820D'}
+                        'polygon': '0x2E953a70C37E8CB4553DAe1F5760128237c8820D',
+                        'core': '0x5c5979832a60c17bb06676fa906bedd1a013e18c'}
 
 nft_claim_addresses = {'bsc': '0xe9AD444cF80E1d6Ba062A2Dd6f53b740b5F0aa14',
-                'polygon': '0xa25bE50be65070c2Ad96d5eD639061de31c45e12'}
+                       'polygon': '0xa25bE50be65070c2Ad96d5eD639061de31c45e12',
+                       'core' : '0x4AbC491f1f41B13C552Bb1C769F9459563130851'}
 
 sender_msgs = {'bsc': '0xfd3f4d96378072db0862a6f76cc258c2b7ea36cc',
-                'polygon': '0xdB6fb08DD8Ce406DA8Ff53FAe65Bd374e3d68681'}
+               'polygon': '0xdB6fb08DD8Ce406DA8Ff53FAe65Bd374e3d68681'}
 
-fee_for_message = {'bsc': int(0.001*10**18),
-        'polygon': int(0.5*10**18)}
+native = {'bsc': 'bnb',
+         'polygon': 'matic'}
 
-nfts_addresses = {'greenfield':{'bsc':"0x13D23d867e73aF912Adf5d5bd47915261eFa28F2"},
-                 'zkLightClient':{'bsc':'0xD2cCC9EE7Ea2ccd154c727A46D475ddA49E99852','polygon':'0x6b0C248679F493481411a0A14cd5FC2DBBe8Ab02'}, #first mint #0x3FA9B338B6e5c5F433AA7E87250cC18808D120Fd
-                 'Mainnet Alpha':{'polygon':'0x9d5D479a84F3358E8e27Afe056494BD2dA239acD'},
-                 'Luban':{'bsc':'0x9885C17Dd44c00C37B98F510cdff099EfF437dcE'}}
+nfts_addresses = {'greenfield': {'bsc': "0x13D23d867e73aF912Adf5d5bd47915261eFa28F2"},
+                  'zkLightClient': {'bsc': '0xD2cCC9EE7Ea2ccd154c727A46D475ddA49E99852',
+                                    'polygon': '0x6b0C248679F493481411a0A14cd5FC2DBBe8Ab02'},
+                  'Mainnet Alpha': {'polygon': '0x9d5D479a84F3358E8e27Afe056494BD2dA239acD',
+                                    'core': '0x61DFDbcC65DaF1F60fB1DbE703D84940dA28526c'},
+                  'Luban': {'bsc': '0x9885C17Dd44c00C37B98F510cdff099EfF437dcE'},
+                  'ZkBridge on opBNB': {'bsc': '0x9c614a8E5a23725214024d2C3633BE30D44806f9',
+                                        'polygon': '0xfeb105763753e9d26DfD4aae1Ed368aa7cC18260',
+                                        'core': '0x0f83DA622E36Ee42cfeB222257E1baF20E16a491'}}
 
-reversed_nfts_addresses = {'greenfield':{'polygon':"0x25B2e530F4bAbfE6831B7f0801Bf6a59a2911e59"},
-                 'zkLightClient':{'bsc':'0x3FA9B338B6e5c5F433AA7E87250cC18808D120Fd','polygon':'0x20a4dFCe37388a6f5a713389f079B333EC27F7D1'}, #first mint #0x3FA9B338B6e5c5F433AA7E87250cC18808D120Fd
-                 'Mainnet Alpha':{'bsc':'0x9194EDA0BDe962A013B890184e212462650FEe8a'},
-                'Luban':{'polygon':'0x952Ba02590b50e2e80801F27a2417aB05eFE564b'}}
+reversed_nfts_addresses = {'greenfield': {'polygon': "0x25B2e530F4bAbfE6831B7f0801Bf6a59a2911e59"},
+                           'zkLightClient': {'bsc': '0x3FA9B338B6e5c5F433AA7E87250cC18808D120Fd',
+                                             'polygon': '0x20a4dFCe37388a6f5a713389f079B333EC27F7D1'},
+                           'Mainnet Alpha': {'bsc': '0x9194EDA0BDe962A013B890184e212462650FEe8a'},
+                           'Luban': {'polygon': '0x952Ba02590b50e2e80801F27a2417aB05eFE564b'}}
