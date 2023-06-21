@@ -41,7 +41,7 @@ class ZkBridge(Help):
     def __init__(self, privatekey, delay, chain, to, api, mode, proxy=None):
         self.privatekey = privatekey
         self.chain = chain
-        self.to = to
+        self.to = random.choice(to) if type(to) == list else to
         self.w3 = Web3(Web3.HTTPProvider(rpcs[self.chain]))
         self.account = self.w3.eth.account.from_key(self.privatekey)
         self.address = self.account.address
