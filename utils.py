@@ -225,7 +225,7 @@ class ZkBridge(Help):
                             {'from': self.address, 'nonce': nonce}),
                         'nonce': nonce,
                         'maxFeePerGas': int(self.w3.eth.gas_price),
-                        'maxPriorityFeePerGas': int(self.w3.eth.gas_price)
+                        'maxPriorityFeePerGas': int(self.w3.eth.gas_price*0.8)
                     })
                     if self.chain == 'bsc' or self.chain == 'core':
                         del tx['maxFeePerGas']
@@ -297,7 +297,7 @@ class ZkBridge(Help):
                                                            id_).estimate_gas({'from': self.address, 'nonce': nonce}),
                             'nonce': nonce,
                             'maxFeePerGas': int(self.w3.eth.gas_price),
-                            'maxPriorityFeePerGas': int(self.w3.eth.gas_price)
+                            'maxPriorityFeePerGas': int(self.w3.eth.gas_price*0.8)
                         })
                         if self.chain == 'bsc' or self.chain == 'core':
                             del tx['maxFeePerGas']
@@ -351,7 +351,7 @@ class ZkBridge(Help):
                             enco).estimate_gas({'from': self.address, 'nonce': nonce, 'value': fee}),
                         'nonce': nonce,
                         'maxFeePerGas': int(self.w3.eth.gas_price),
-                        'maxPriorityFeePerGas': int(self.w3.eth.gas_price)
+                        'maxPriorityFeePerGas': int(self.w3.eth.gas_price*0.8)
                     })
                     if self.chain == 'bsc' or self.chain == 'core':
                         del tx['maxFeePerGas']
@@ -585,7 +585,7 @@ class ZkBridge(Help):
                             {'from': address, 'nonce': nonce}),
                         'nonce': nonce,
                         'maxFeePerGas': int(w3.eth.gas_price),
-                        'maxPriorityFeePerGas': int(w3.eth.gas_price)
+                        'maxPriorityFeePerGas': int(w3.eth.gas_price*0.8)
                     })
                     if self.to == 'bsc' or self.to == 'core':
                         del tx['maxFeePerGas']
@@ -665,7 +665,7 @@ class ZkBridge(Help):
                         {'from': address, 'nonce': nonce}),
                     'nonce': nonce,
                     'maxFeePerGas': int(w3.eth.gas_price),
-                    'maxPriorityFeePerGas': int(w3.eth.gas_price)
+                    'maxPriorityFeePerGas': int(w3.eth.gas_price*0.8)
                 })
                 if self.to == 'bsc' or self.to == 'core':
                     del tx['maxFeePerGas']
@@ -937,7 +937,7 @@ class ZkMessage(Help):
                              'value': value}),
                         'nonce': self.w3.eth.get_transaction_count(self.address),
                         'maxFeePerGas': int(self.w3.eth.gas_price),
-                        'maxPriorityFeePerGas': int(self.w3.eth.gas_price)
+                        'maxPriorityFeePerGas': int(self.w3.eth.gas_price*0.8)
                     })
                     if self.chain == 'bsc':
                         del tx['maxFeePerGas']
