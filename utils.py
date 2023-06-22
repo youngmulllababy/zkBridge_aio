@@ -477,14 +477,14 @@ class ZkBridge(Help):
         start_time = int(time.time())
         while True:
             current_time = int(time.time())
+            if current_time >= start_time + max_wait_time:
+                logger.info(
+                    f'{self.address} - транзакция не подтвердилась за {max_wait_time} cекунд, начинаю повторную отправку...')
+                return 0
             try:
                 status = w3.eth.get_transaction_receipt(tx_hash)['status']
-                if status in [0, 1]:
+                if status == 1:
                     return status
-                if current_time >= start_time + max_wait_time:
-                    logger.info(
-                        f'{self.address} - транзакция не подтвердилась за {max_wait_time} cекунд, начинаю повторную отправку...')
-                    return 0
                 time.sleep(1)
             except Exception as error:
                 time.sleep(1)
