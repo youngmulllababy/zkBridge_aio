@@ -297,7 +297,7 @@ class ZkBridge(Help):
                             'nonce': nonce,
                             'maxFeePerGas': int(self.w3.eth.gas_price),
                             'maxPriorityFeePerGas': int(self.w3.eth.gas_price)
-                    })
+                        })
                         if chain == 'bsc':
                             del tx['maxFeePerGas']
                             del tx['maxPriorityFeePerGas']
@@ -929,7 +929,8 @@ class ZkMessage(Help):
                                                       message).build_transaction({
                         'from': self.address,
                         'value': value,
-                        'gas': mailer.functions.sendMessage(to_chain_id, dst_address, lz_id, lzdst_address, fee, self.address,
+                        'gas': mailer.functions.sendMessage(to_chain_id, dst_address, lz_id, lzdst_address, fee,
+                                                            self.address,
                                                             message).estimate_gas(
                             {'from': self.address, 'nonce': self.w3.eth.get_transaction_count(self.address),
                              'value': value}),
@@ -949,7 +950,8 @@ class ZkMessage(Help):
                         logger.success(
                             f'{self.address}:{self.chain} - успешно отправил сообщение {message} в {self.to} : {self.scan}{self.w3.to_hex(hash_)}...')
                         time.sleep(5)
-                        msg = self.msg(session, contract_msg, message, from_chain_id, to_chain_id, self.w3.to_hex(hash_))
+                        msg = self.msg(session, contract_msg, message, from_chain_id, to_chain_id,
+                                       self.w3.to_hex(hash_))
                         if msg:
                             self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
                             return self.address, 'success'
