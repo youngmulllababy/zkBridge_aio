@@ -266,6 +266,9 @@ class ZkBridge(Help):
                 if session:
                     time.sleep(5)
                     id_ = self.balance_and_get_id()
+                else:
+                    return False
+
         else:
             session = self.profile()
             id_ = self.balance_and_get_id()
@@ -471,13 +474,13 @@ class ZkBridge(Help):
                 time.sleep(1)
 
     def redeem_nft(self, session=None, hash_=None):
-        self.add_hash_and_address(123)
         if self.mode == 2:
             data = self.profile()
             if data:
                 session = data
             else:
-                return self.address, f'error + {hash_}'
+                self.add_hash_and_address(hash_)
+                return self.address, f'error'
 
         def get_order_by_hash():
             logger.info(f'{self.address}:{self.to} - пробую делать redeem {self.nft} в сети назначения...')
@@ -618,14 +621,14 @@ class ZkBridge(Help):
         if data:
             hash_, session, nft_id = data
         else:
-            return address, False
+            return address, 'error'
 
         while True:
             data = self.go_requests(hash_, session, nft_id)
             if data:
                 data_, id_, session = data
             else:
-                return address, False
+                return address, 'error'
             cid = data_['chain_id']
             proof = data_['proof_index']
             blob = data_['proof_blob']

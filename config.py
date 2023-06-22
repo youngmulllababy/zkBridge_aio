@@ -66,11 +66,11 @@ max_wait_time = 150
     NFT - ВЫБОР НАЗВАНИЯ НФТ
 '''
 
-TYPE = ''   # 'messenger' / 'nftbridger' / 'claimer'
+TYPE = 'messenger'   # 'messenger' / 'nftbridger' / 'claimer'
 
 #chains - bsc / polygon / ftm / core / nova / mbeam (самый дешевый для месседжа - nova)
 
-chain = ''
-to = '' #or ['chain', 'chain',...] для выбора рандомной сети
+chain = 'polygon'
+to = 'nova' #or ['chain', 'chain',...] для выбора рандомной сети
 MODE = 1   #mode 1 - mint&bridge 0 - bridge already minted nfts / 2 - claim failed nfts
 nft = ''  #'greenfield' 'zkLightClient' 'Mainnet Alpha' 'Luban' 'ZkBridge on opBNB' /  random.choice['greenfield','zkLightClient','Mainnet Alpha', 'Luban', 'ZkBridge on opBNB']  - random nft
