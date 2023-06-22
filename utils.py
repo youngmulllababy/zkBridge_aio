@@ -271,6 +271,8 @@ class ZkBridge(Help):
                 if session:
                     time.sleep(5)
                     id_ = self.balance_and_get_id()
+                    if id_ == None:
+                        return False
                 else:
                     return False
 
