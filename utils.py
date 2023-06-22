@@ -208,7 +208,7 @@ class ZkBridge(Help):
         with open("hashes.txt", "w") as file:
             file.write(f"{self.privatekey}:{hash_}\n")
 
-    def mint(self, gwei=None):
+    def mint(self):
         while True:
             zkNft = self.w3.eth.contract(address=Web3.to_checksum_address(self.nft_address), abi=zk_nft_abi)
 
@@ -224,8 +224,13 @@ class ZkBridge(Help):
                         'gas': zkNft.functions.mint().estimate_gas(
                             {'from': self.address, 'nonce': nonce}),
                         'nonce': nonce,
-                        'gasPrice': self.w3.eth.gas_price
+                        'maxFeePerGas': int(self.w3.eth.gas_price),
+                        'maxPriorityFeePerGas': int(self.w3.eth.gas_price)
                     })
+                    if chain == 'bsc':
+                        del tx['maxFeePerGas']
+                        del tx['maxPriorityFeePerGas']
+                        tx['gasPrice'] = self.w3.eth.gas_price
                     logger.info(f'{self.address}:{self.chain} - начинаю минт {self.nft}...')
                     sign = self.account.sign_transaction(tx)
                     hash = self.w3.eth.send_raw_transaction(sign.rawTransaction)
@@ -288,9 +293,13 @@ class ZkBridge(Help):
                             'gas': zkNft.functions.approve(Web3.to_checksum_address(self.bridge_address),
                                                            id_).estimate_gas({'from': self.address, 'nonce': nonce}),
                             'nonce': nonce,
-                            'gasPrice': self.w3.eth.gas_price
-
-                        })
+                            'maxFeePerGas': int(self.w3.eth.gas_price),
+                            'maxPriorityFeePerGas': int(self.w3.eth.gas_price)
+                    })
+                        if chain == 'bsc':
+                            del tx['maxFeePerGas']
+                            del tx['maxPriorityFeePerGas']
+                        tx['gasPrice'] = self.w3.eth.gas_price
                         logger.info(f'{self.address}:{self.chain} - начинаю апрув {self.nft} {id_}...')
                         sign = self.account.sign_transaction(tx)
                         hash = self.w3.eth.send_raw_transaction(sign.rawTransaction)
@@ -338,9 +347,13 @@ class ZkBridge(Help):
                             Web3.to_checksum_address(self.nft_address), id_, to,
                             enco).estimate_gas({'from': self.address, 'nonce': nonce, 'value': fee}),
                         'nonce': nonce,
-                        'gasPrice': self.w3.eth.gas_price
+                        'maxFeePerGas': int(self.w3.eth.gas_price),
+                        'maxPriorityFeePerGas': int(self.w3.eth.gas_price)
                     })
-
+                    if chain == 'bsc':
+                        del tx['maxFeePerGas']
+                        del tx['maxPriorityFeePerGas']
+                        tx['gasPrice'] = self.w3.eth.gas_price
                     sign = self.account.sign_transaction(tx)
                     hash = self.w3.eth.send_raw_transaction(sign.rawTransaction)
                     status = self.check_status_tx(hash)
@@ -560,7 +573,7 @@ class ZkBridge(Help):
                 try:
                     nonce = w3.eth.get_transaction_count(address)
                     time.sleep(2)
-                    gasPrice = w3.eth.gas_price
+
                     tx = claim.functions.validateTransactionProof(cid, to_bytes(hexstr=block_hash), proof,
                                                                   to_bytes(hexstr=blob)).build_transaction({
                         'from': address,
@@ -568,8 +581,13 @@ class ZkBridge(Help):
                                                                         to_bytes(hexstr=blob)).estimate_gas(
                             {'from': address, 'nonce': nonce}),
                         'nonce': nonce,
-                        'gasPrice': gasPrice
+                        'maxFeePerGas': int(w3.eth.gas_price),
+                        'maxPriorityFeePerGas': int(w3.eth.gas_price)
                     })
+                    if chain == 'bsc':
+                        del tx['maxFeePerGas']
+                        del tx['maxPriorityFeePerGas']
+                        tx['gasPrice'] = w3.eth.gas_price
                     sign = account.sign_transaction(tx)
                     hash = w3.eth.send_raw_transaction(sign.rawTransaction)
                     status = self.check_status_tx2(w3, hash)
@@ -636,7 +654,6 @@ class ZkBridge(Help):
             try:
                 nonce = w3.eth.get_transaction_count(address)
                 time.sleep(2)
-                gasPrice = w3.eth.gas_price
                 tx = claim.functions.validateTransactionProof(cid, to_bytes(hexstr=block_hash), proof,
                                                               to_bytes(hexstr=blob)).build_transaction({
                     'from': address,
@@ -644,8 +661,13 @@ class ZkBridge(Help):
                                                                     to_bytes(hexstr=blob)).estimate_gas(
                         {'from': address, 'nonce': nonce}),
                     'nonce': nonce,
-                    'gasPrice': gasPrice
+                    'maxFeePerGas': int(w3.eth.gas_price),
+                    'maxPriorityFeePerGas': int(w3.eth.gas_price)
                 })
+                if chain == 'bsc':
+                    del tx['maxFeePerGas']
+                    del tx['maxPriorityFeePerGas']
+                    tx['gasPrice'] = w3.eth.gas_price
                 sign = account.sign_transaction(tx)
                 hash = w3.eth.send_raw_transaction(sign.rawTransaction)
                 status = self.check_status_tx2(w3, hash)
@@ -910,8 +932,13 @@ class ZkMessage(Help):
                             {'from': self.address, 'nonce': self.w3.eth.get_transaction_count(self.address),
                              'value': value}),
                         'nonce': self.w3.eth.get_transaction_count(self.address),
-                        'gasPrice': self.w3.eth.gas_price
+                        'maxFeePerGas': int(self.w3.eth.gas_price),
+                        'maxPriorityFeePerGas': int(self.w3.eth.gas_price)
                     })
+                    if chain == 'bsc':
+                        del tx['maxFeePerGas']
+                        del tx['maxPriorityFeePerGas']
+                        tx['gasPrice'] = self.w3.eth.gas_price
                     sign = self.account.sign_transaction(tx)
                     hash_ = self.w3.eth.send_raw_transaction(sign.rawTransaction)
                     status = self.check_status_tx(hash_)
