@@ -886,55 +886,55 @@ class ZkMessage(Help):
 
         native_ = native[self.chain]
         zkFee = mailer.functions.fees(to_chain_id).call()
-        #check lz
-        if self.check_status_lz():
-            fee = mailer.functions.estimateLzFee(lz_id, self.address, message).call()
-            value = fee + zkFee
-            logger.info(f'{self.address}:{self.chain} - начинаю отправку сообщения в {self.to} через L0, предполагаемая комса - {(fee+zkFee)/10**18} {native_}...')
-        else:
-            logger.info(f'{self.address}:{self.chain} - начинаю отправку сообщения в {self.to}, не через L0...')
-            fee = 0
-            value = zkFee
 
         while True:
-            try:
-                tx = mailer.functions.sendMessage(to_chain_id, dst_address, lz_id, lzdst_address, fee, self.address,
-                                                  message).build_transaction({
-                    'from': self.address,
-                    'value': value,
-                    'gas': mailer.functions.sendMessage(to_chain_id, dst_address, lz_id, lzdst_address, fee, self.address,
-                                                        message).estimate_gas(
-                        {'from': self.address, 'nonce': self.w3.eth.get_transaction_count(self.address),
-                         'value': value}),
-                    'nonce': self.w3.eth.get_transaction_count(self.address),
-                    'gasPrice': self.w3.eth.gas_price
-                })
-                sign = self.account.sign_transaction(tx)
-                hash_ = self.w3.eth.send_raw_transaction(sign.rawTransaction)
-                status = self.check_status_tx(hash_)
-                self.sleep_indicator(5)
-                if status == 1:
-                    logger.success(
-                        f'{self.address}:{self.chain} - успешно отправил сообщение {message} в {self.to} : {self.scan}{self.w3.to_hex(hash_)}...')
-                    time.sleep(5)
-                    msg = self.msg(session, contract_msg, message, from_chain_id, to_chain_id, self.w3.to_hex(hash_))
-                    if msg:
-                        self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
-                        return self.address, 'success'
-                else:
-                    logger.info(f'{self.address}:{self.chain} - пробую еще раз отправлять сообщение...')
-                    self.send_msg()
+            lz_status = self.check_status_lz()
+            if lz_status:
+                fee = mailer.functions.estimateLzFee(lz_id, self.address, message).call()
+                value = fee + zkFee
+                logger.info(
+                    f'{self.address}:{self.chain} - начинаю отправку сообщения в {self.to} через L0, предполагаемая комса - {(fee + zkFee) / 10 ** 18} {native_}...')
+                try:
+                    tx = mailer.functions.sendMessage(to_chain_id, dst_address, lz_id, lzdst_address, fee, self.address,
+                                                      message).build_transaction({
+                        'from': self.address,
+                        'value': value,
+                        'gas': mailer.functions.sendMessage(to_chain_id, dst_address, lz_id, lzdst_address, fee, self.address,
+                                                            message).estimate_gas(
+                            {'from': self.address, 'nonce': self.w3.eth.get_transaction_count(self.address),
+                             'value': value}),
+                        'nonce': self.w3.eth.get_transaction_count(self.address),
+                        'gasPrice': self.w3.eth.gas_price
+                    })
+                    sign = self.account.sign_transaction(tx)
+                    hash_ = self.w3.eth.send_raw_transaction(sign.rawTransaction)
+                    status = self.check_status_tx(hash_)
+                    self.sleep_indicator(5)
+                    if status == 1:
+                        logger.success(
+                            f'{self.address}:{self.chain} - успешно отправил сообщение {message} в {self.to} : {self.scan}{self.w3.to_hex(hash_)}...')
+                        time.sleep(5)
+                        msg = self.msg(session, contract_msg, message, from_chain_id, to_chain_id, self.w3.to_hex(hash_))
+                        if msg:
+                            self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
+                            return self.address, 'success'
+                    else:
+                        logger.info(f'{self.address}:{self.chain} - пробую еще раз отправлять сообщение...')
+                        self.send_msg()
 
-            except Exception as e:
-                error = str(e)
-                if 'nonce too low' in error or 'already known' in error or 'Message already executed' in error:
-                    time.sleep(5)
+                except Exception as e:
+                    error = str(e)
+                    if 'nonce too low' in error or 'already known' in error or 'Message already executed' in error:
+                        time.sleep(5)
 
-                elif 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
-                    logger.error(
-                        f'{self.address}:{self.chain} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
-                    time.sleep(5)
-                    return self.address, 'error'
-                else:
-                    logger.error(f'{self.address}:{self.chain} - {e}...')
-                    return self.address, 'error'
+                    elif 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
+                        logger.error(
+                            f'{self.address}:{self.chain} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
+                        time.sleep(5)
+                        return self.address, 'error'
+                    else:
+                        logger.error(f'{self.address}:{self.chain} - {e}...')
+                        return self.address, 'error'
+            else:
+                logger.info(f'{self.address}:{self.chain} - cплю 30 секунд так как л0 не активен...')
+                self.sleep_indicator(30)
