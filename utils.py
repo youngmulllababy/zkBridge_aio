@@ -302,7 +302,7 @@ class ZkBridge(Help):
                         if self.chain == 'bsc' or self.chain == 'core':
                             del tx['maxFeePerGas']
                             del tx['maxPriorityFeePerGas']
-                        tx['gasPrice'] = self.w3.eth.gas_price
+                            tx['gasPrice'] = self.w3.eth.gas_price
                         logger.info(f'{self.address}:{self.chain} - начинаю апрув {self.nft} {id_}...')
                         sign = self.account.sign_transaction(tx)
                         hash = self.w3.eth.send_raw_transaction(sign.rawTransaction)
