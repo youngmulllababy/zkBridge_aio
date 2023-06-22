@@ -227,10 +227,11 @@ class ZkBridge(Help):
                         'maxFeePerGas': int(self.w3.eth.gas_price),
                         'maxPriorityFeePerGas': int(self.w3.eth.gas_price)
                     })
-                    if chain == 'bsc':
+                    if self.chain == 'bsc' or self.chain == 'core':
                         del tx['maxFeePerGas']
                         del tx['maxPriorityFeePerGas']
                         tx['gasPrice'] = self.w3.eth.gas_price
+
                     logger.info(f'{self.address}:{self.chain} - начинаю минт {self.nft}...')
                     sign = self.account.sign_transaction(tx)
                     hash = self.w3.eth.send_raw_transaction(sign.rawTransaction)
@@ -298,7 +299,7 @@ class ZkBridge(Help):
                             'maxFeePerGas': int(self.w3.eth.gas_price),
                             'maxPriorityFeePerGas': int(self.w3.eth.gas_price)
                         })
-                        if chain == 'bsc':
+                        if self.chain == 'bsc' or self.chain == 'core':
                             del tx['maxFeePerGas']
                             del tx['maxPriorityFeePerGas']
                         tx['gasPrice'] = self.w3.eth.gas_price
@@ -352,7 +353,7 @@ class ZkBridge(Help):
                         'maxFeePerGas': int(self.w3.eth.gas_price),
                         'maxPriorityFeePerGas': int(self.w3.eth.gas_price)
                     })
-                    if chain == 'bsc':
+                    if self.chain == 'bsc' or self.chain == 'core':
                         del tx['maxFeePerGas']
                         del tx['maxPriorityFeePerGas']
                         tx['gasPrice'] = self.w3.eth.gas_price
@@ -586,7 +587,7 @@ class ZkBridge(Help):
                         'maxFeePerGas': int(w3.eth.gas_price),
                         'maxPriorityFeePerGas': int(w3.eth.gas_price)
                     })
-                    if chain == 'bsc':
+                    if self.to == 'bsc' or self.to == 'core':
                         del tx['maxFeePerGas']
                         del tx['maxPriorityFeePerGas']
                         tx['gasPrice'] = w3.eth.gas_price
@@ -666,7 +667,7 @@ class ZkBridge(Help):
                     'maxFeePerGas': int(w3.eth.gas_price),
                     'maxPriorityFeePerGas': int(w3.eth.gas_price)
                 })
-                if chain == 'bsc':
+                if self.to == 'bsc' or self.to == 'core':
                     del tx['maxFeePerGas']
                     del tx['maxPriorityFeePerGas']
                     tx['gasPrice'] = w3.eth.gas_price
@@ -938,7 +939,7 @@ class ZkMessage(Help):
                         'maxFeePerGas': int(self.w3.eth.gas_price),
                         'maxPriorityFeePerGas': int(self.w3.eth.gas_price)
                     })
-                    if chain == 'bsc':
+                    if self.chain == 'bsc':
                         del tx['maxFeePerGas']
                         del tx['maxPriorityFeePerGas']
                         tx['gasPrice'] = self.w3.eth.gas_price
