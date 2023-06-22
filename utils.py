@@ -357,6 +357,9 @@ class ZkBridge(Help):
                             f'{self.address}:{self.chain} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
                         time.sleep(5)
                         return False
+                    if 'nonce too low' in error or 'already known' in error:
+                        logger.info(f'{self.address}:{self.chain} - ошибка при бридже, пробую еще раз...')
+                        bridge_()
                     else:
                         logger.error(f'{self.address}:{self.chain} - {e}')
                         return False
