@@ -267,6 +267,9 @@ class ZkBridge(Help):
         if self.mode == 1:
             id_ = self.balance_and_get_id()
             session = self.profile()
+            if session:
+                session = session
+
             if id_ == None:
                 session = self.mint()
                 if session:
@@ -276,6 +279,8 @@ class ZkBridge(Help):
                         return False
                 else:
                     return False
+            else:
+                return False
 
         else:
             session = self.profile()
