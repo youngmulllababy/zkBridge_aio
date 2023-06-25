@@ -22,7 +22,8 @@ with open("hashes.txt", "r") as f:
 
 rpcs = {'bsc': 'https://bscrpc.com',
         'polygon': 'https://polygon-rpc.com',
-        'core': 'https://rpc.coredao.org'}
+        'core': 'https://rpc.coredao.org',
+        'opbnb': 'https://opbnb-testnet-rpc.bnbchain.org'}
 
 
 DELAY = (0, 100)
@@ -48,7 +49,7 @@ max_wait_time = 150
     zkLightClient   -   сhain - bsc, polygon  to - bsc, polygon
     Mainnet Alpha   -   сhain - polygon, core to - bsc
     Luban   -   сhain - bsc  to - polygon
-    ZkBridge on opBNB  -  chain - bsc, polygon, core  to - any
+    ZkBridge on opBNB  -  chain - bsc, polygon, core  to - bsc, polygon, core, opbnb
     
     
     данные ниже для работы в режиме 0 (режим бриджа УЖЕ ЗАБРИДЖЕННЫХ КОГДА ТО НФТ)
@@ -66,11 +67,11 @@ max_wait_time = 150
     NFT - ВЫБОР НАЗВАНИЯ НФТ
 '''
 
-TYPE = 'messenger'   # 'messenger' / 'nftbridger' / 'claimer'
+TYPE = ''   # 'messenger' / 'nftbridger' / 'claimer'
 
-#chains - bsc / polygon / ftm / core / nova / mbeam (самый дешевый для месседжа - nova)
+#chains - bsc / polygon / ftm / core / nova / mbeam / opbnb (самый дешевый для месседжа - nova)
 
-chain = 'polygon'
-to = 'nova' #or ['chain', 'chain',...] для выбора рандомной сети
+chain = ''
+to = '' #or ['chain', 'chain',...] для выбора рандомной сети
 MODE = 1   #mode 1 - mint&bridge 0 - bridge already minted nfts / 2 - claim failed nfts
 nft = ''  #'greenfield' 'zkLightClient' 'Mainnet Alpha' 'Luban' 'ZkBridge on opBNB' /  random.choice['greenfield','zkLightClient','Mainnet Alpha', 'Luban', 'ZkBridge on opBNB']  - random nft

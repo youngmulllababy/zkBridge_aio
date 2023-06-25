@@ -24,7 +24,8 @@ ids = {'bsc': 56,
 
 scans = {'bsc': 'https://bscscan.com/tx/',
          'polygon': 'https://polygonscan.com/tx/',
-         'core': 'https://scan.coredao.org/tx/'}
+         'core': 'https://scan.coredao.org/tx/',
+         'opbnb': 'https://opbnbscan.com/tx/'}
 
 dst_addresses = {'bsc': '0xA98163227B85CcC765295Ce5C18E8aAD663De147',
                  'polygon': '0xCcE1E39f2Ef1e69E6B61Cf79212E96C92C4aFf9a',
