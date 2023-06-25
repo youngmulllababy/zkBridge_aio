@@ -14,11 +14,13 @@ chain_ids = {'bsc': 3,
              'ftm': 6,
              'core': 17,
              'mbeam': 9,
-             'nova': 14}
+             'nova': 14,
+             'opbnb': 116}
 
 ids = {'bsc': 56,
        'polygon': 137,
-       'core': 1116}
+       'core': 1116,
+       'opbnb': 5611}
 
 scans = {'bsc': 'https://bscscan.com/tx/',
          'polygon': 'https://polygonscan.com/tx/',
@@ -42,7 +44,8 @@ nft_bridge_addresses = {'bsc': '0xE09828f0DA805523878Be66EA2a70240d312001e',
 
 nft_claim_addresses = {'bsc': '0xe9AD444cF80E1d6Ba062A2Dd6f53b740b5F0aa14',
                        'polygon': '0xa25bE50be65070c2Ad96d5eD639061de31c45e12',
-                       'core' : '0x4AbC491f1f41B13C552Bb1C769F9459563130851'}
+                       'core': '0x4AbC491f1f41B13C552Bb1C769F9459563130851',
+                       'opbnb': '0x4CC870C8fDfBC512943FE60c29c98d515f868EBF'}
 
 sender_msgs = {'bsc': '0xfd3f4d96378072db0862a6f76cc258c2b7ea36cc',
                'polygon': '0xdB6fb08DD8Ce406DA8Ff53FAe65Bd374e3d68681'}
