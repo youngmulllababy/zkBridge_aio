@@ -279,9 +279,6 @@ class ZkBridge(Help):
                         return False
                 else:
                     return False
-            else:
-                return False
-
         else:
             session = self.profile()
             id_ = self.balance_and_get_id()
