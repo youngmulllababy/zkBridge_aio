@@ -74,4 +74,4 @@ TYPE = ''   # 'messenger' / 'nftbridger' / 'claimer'
 chain = ''
 to = '' #or ['chain', 'chain',...] для выбора рандомной сети
 MODE = 1   #mode 1 - mint&bridge 0 - bridge already minted nfts / 2 - claim failed nfts
-nft = ''  #'greenfield' 'zkLightClient' 'Mainnet Alpha' 'Luban' 'ZkBridge on opBNB' /  random.choice['greenfield','zkLightClient','Mainnet Alpha', 'Luban', 'ZkBridge on opBNB']  - random nft
+nft = ''  #'greenfield' 'zkLightClient' 'Mainnet Alpha' 'Luban' 'ZkBridge on opBNB' /  ['greenfield','zkLightClient','Mainnet Alpha', 'Luban', 'ZkBridge on opBNB']  - random nft

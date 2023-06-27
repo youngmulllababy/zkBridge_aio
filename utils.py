@@ -45,7 +45,7 @@ class ZkBridge(Help):
         self.w3 = Web3(Web3.HTTPProvider(rpcs[self.chain]))
         self.account = self.w3.eth.account.from_key(self.privatekey)
         self.address = self.account.address
-        self.nft = nft
+        self.nft = random.choice(nft) if type(nft) == list else nft
         self.delay = delay
         self.proxy = proxy
         self.mode = mode
