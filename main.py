@@ -26,7 +26,7 @@ async def main():
     if MORALIS_API_KEY == '':
         logger.error('Не вставлен апи ключ моралис!...')
         return
-    if nft not in nfts_addresses.values():
+    if nft not in nfts_addresses.keys():
         logger.error('Неправильно вставлено название нфт!...')
         return
     if not MODE:
