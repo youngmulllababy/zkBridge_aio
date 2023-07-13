@@ -600,7 +600,7 @@ class ZkMessage(Help):
                 if self.chain == 'bsc' or self.chain == 'celo':
                     del tx['maxFeePerGas']
                     del tx['maxPriorityFeePerGas']
-                    tx['gasPrice'] = self.w3.eth.gas_price
+                    tx['gasPrice'] = await self.w3.eth.gas_price
                 sign = self.account.sign_transaction(tx)
                 hash_ = await self.w3.eth.send_raw_transaction(sign.rawTransaction)
                 status = await self.check_status_tx(hash_)
