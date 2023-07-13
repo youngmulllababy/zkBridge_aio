@@ -246,7 +246,9 @@ class ZkBridge(Help):
                     return False
 
     async def bridge_nft(self):
-
+        time_ = random.randint(start_delay[0], start_delay[1])
+        logger.info(f'Начинаю работу через {time_} cекунд...')
+        await asyncio.sleep(time_)
         id_ = await self.balance_and_get_id()
         headers = await self.profile()
         if headers:
@@ -554,6 +556,9 @@ class ZkMessage(Help):
             return await self.create_msg()
 
     async def send_msg(self):
+        time_ = random.randint(start_delay[0], start_delay[1])
+        logger.info(f'Начинаю работу через {time_} cекунд...')
+        await asyncio.sleep(time_)
         data = await self.profile()
         if data:
             headers = data
