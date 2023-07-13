@@ -23,9 +23,7 @@ async def main():
         if i == '':
             logger.error('Не вставлены rpc в файле config!...')
             return
-    if MORALIS_API_KEY == '':
-        logger.error('Не вставлен апи ключ моралис!...')
-        return
+
     if nft not in nfts_addresses.keys():
         logger.error('Неправильно вставлено название нфт!...')
         return
@@ -47,6 +45,9 @@ async def main():
             else:
                 proxy = None
             if MODE == 'nftbridger':
+                if MORALIS_API_KEY == '':
+                    logger.error('Не вставлен апи ключ моралис!...')
+                    return
                 logger.info('Запущен режим минта и бриджа нфт...')
                 zk = ZkBridge(key, DELAY, chain, to, MORALIS_API_KEY, proxy)
                 tasks.append(zk.bridge_nft())
