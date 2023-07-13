@@ -8,9 +8,9 @@
 
 * Приватные кошельки пишем в keys.txt - один ключ на одной строке </br>
 
-* Прокси в proxyy.txt - один прокси на одной строке  в формате http://login:pass@ip:port</br>
+* Прокси в proxyy.txt - один прокси на одной строке  в формате login:pass@ip:port</br>
 
-* http://login:pass@ip:port</br>
+* login:pass@ip:port</br>
 
 * Необходим апи ключ моралис - https://admin.moralis.io/settings#secret-keys
  </br>
