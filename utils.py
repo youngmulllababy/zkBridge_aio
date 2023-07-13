@@ -181,7 +181,7 @@ class ZkBridge(Help):
                 balance = await contract.functions.balanceOf(self.address).call()
                 if balance > 0:
                     totalSupply = await contract.functions.totalSupply().call()
-                    id_ = (await contract.functions.tokensOfOwnerIn(self.address, totalSupply - 100, totalSupply).call())[
+                    id_ = (await contract.functions.tokensOfOwnerIn(self.address, totalSupply - 500, totalSupply).call())[
                         0]
                     return id_
                 else:
