@@ -1,3 +1,4 @@
+
 with open("keys.txt", "r") as f:
     keys = [row.strip() for row in f]
 
@@ -56,9 +57,9 @@ MODE = ''   # 'messenger' / 'nftbridger'
     Mainnet Alpha   -   сhain - polygon, core to - bsc
     Luban   -   сhain - bsc  to - polygon
     ZkBridge on opBNB  -  chain - bsc, polygon, core  to - bsc, polygon, core, opbnb
-    Pandra  -  chain - bsc, polygon, core to - bsc, polygon, core
+    Pandra  -  chain - bsc, polygon, core to - bsc, polygon, core, combo
 '''
-# cети  bsc  polygon  core  ftm  сelo  nova
+# cети  bsc  polygon  core  ftm  сelo  nova  combo
 
 # из какой сети минтить и бриджить / отправлять сообщение
 chain = ''
@@ -70,3 +71,4 @@ to = ''
 # выбор нфт для минта и бриджа
 # список нфт 'greenfield' 'zkLightClient' 'Mainnet Alpha' 'Luban' 'ZkBridge on opBNB', 'Pandra'
 nft = ''
+

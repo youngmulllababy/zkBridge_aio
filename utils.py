@@ -55,8 +55,8 @@ class ZkBridge(Help):
         self.proxy = f'http://{proxy}' if proxy else None
         self.moralisapi = api
         self.nft_address = nfts_addresses[self.nft][self.chain]
-        self.bridge_address = nft_bridge_addresses[self.chain] if self.nft != 'Pandra' else nft_lz_bridge_addresses[
-            self.chain]
+        self.bridge_address = nft_lz_bridge_addresses[
+            self.chain] if self.nft == 'Pandra' and self.to != 'combo' else nft_bridge_addresses[self.chain]
 
     async def auth(self):
         ua = UserAgent()
@@ -317,12 +317,27 @@ class ZkBridge(Help):
 
         async def bridge_():
             bridge = self.w3.eth.contract(address=Web3.to_checksum_address(self.bridge_address),
-                                          abi=bridge_abi if self.nft != 'Pandra' else bridge_lz_abi)
+                                          abi=bridge_lz_abi if self.nft == 'Pandra' and self.to != 'combo' else bridge_abi)
             to = chain_ids[self.to]
             logger.info(f'{self.address}:{self.chain} - начинаю бридж {self.nft} {id_}...')
             while True:
                 try:
-                    if self.nft != 'Pandra':
+                    if self.nft == 'Pandra' and self.to != 'combo':
+                        nonce = await self.w3.eth.get_transaction_count(self.address)
+                        await asyncio.sleep(2)
+                        args = Web3.to_checksum_address(self.nft_address), id_, stargate_ids[
+                            self.to], self.address, '0x000100000000000000000000000000000000000000000000000000000000001b7740'
+                        lzfee = (await bridge.functions.estimateFee(*args).call())
+                        tx = await bridge.functions.transferNFT(*args).build_transaction({
+                            'from': self.address,
+                            'value': lzfee,
+
+                            'nonce': nonce,
+                            'maxFeePerGas': int(await self.w3.eth.gas_price),
+                            'maxPriorityFeePerGas': int((await self.w3.eth.gas_price) * 0.8)
+                        })
+                        tx['gas'] = await self.w3.eth.estimate_gas(tx)
+                    else:
                         fee = await bridge.functions.fee(to).call()
                         enco = f'0x000000000000000000000000{self.address[2:]}'
                         nonce = await self.w3.eth.get_transaction_count(self.address)
@@ -339,20 +354,7 @@ class ZkBridge(Help):
                             'maxFeePerGas': int(await self.w3.eth.gas_price),
                             'maxPriorityFeePerGas': int((await self.w3.eth.gas_price) * 0.8)
                         })
-                    else:
-                        nonce = await self.w3.eth.get_transaction_count(self.address)
-                        await asyncio.sleep(2)
-                        args = Web3.to_checksum_address(self.nft_address), id_, stargate_ids[self.to], self.address, '0x000100000000000000000000000000000000000000000000000000000000001b7740'
-                        lzfee = (await bridge.functions.estimateFee(*args).call())
-                        tx = await bridge.functions.transferNFT(*args).build_transaction({
-                            'from': self.address,
-                            'value': lzfee,
 
-                            'nonce': nonce,
-                            'maxFeePerGas': int(await self.w3.eth.gas_price),
-                            'maxPriorityFeePerGas': int((await self.w3.eth.gas_price) * 0.8)
-                        })
-                        tx['gas'] = await self.w3.eth.estimate_gas(tx)
                     if self.chain == 'bsc' or self.chain == 'core':
                         del tx['maxFeePerGas']
                         del tx['maxPriorityFeePerGas']
@@ -363,7 +365,7 @@ class ZkBridge(Help):
                     await self.sleep_indicator(5)
                     if status == 1:
                         logger.success(
-                            f'{self.address}:{self.chain} - успешно бриджанул {self.nft} {id_} : {scans[self.chain]}{self.w3.to_hex(hash)}...')
+                            f'{self.address}:{self.chain} - успешно бриджанул {self.nft} {id_} в {self.to}: {scans[self.chain]}{self.w3.to_hex(hash)}...')
                         await self.sleep_indicator(random.randint(1, 20))
                         return self.privatekey, self.address, f'successfully bridged {self.nft} to {self.to}'
                     else:

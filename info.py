@@ -18,6 +18,7 @@ chain_ids = {'bsc': 3,
              'mbeam': 9,
              'nova': 14,
              'opbnb': 116,
+             'combo': 114,
              'celo': 18}
 
 ids = {'bsc': 56,
