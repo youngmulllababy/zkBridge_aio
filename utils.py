@@ -396,7 +396,7 @@ class ZkMessage(Help):
         self.privatekey = privatekey
         self.chain = chain
         self.to = random.choice(to) if type(to) == list else to
-        self.w3 = self.w3 = Web3(Web3.AsyncHTTPProvider(rpcs[self.chain]),
+        self.w3 = Web3(Web3.AsyncHTTPProvider(rpcs[self.chain]),
                                  modules={'eth': (AsyncEth,)}, middlewares=[])
         self.scan = scans[self.chain]
         self.account = self.w3.eth.account.from_key(self.privatekey)
