@@ -82,8 +82,8 @@ nfts_addresses = {'greenfield': {'bsc': "0x13D23d867e73aF912Adf5d5bd47915261eFa2
                                         'core': '0x0f83DA622E36Ee42cfeB222257E1baF20E16a491'},
                   'Pandra': {'bsc': '0x87a218Ae43C136B3148A45EA1A282517794002c8',
                              'polygon': '0x141A1fb33683C304DA7C3fe6fC6a49B5C0c2dC42',
-                             'core': '0x36e5121618c0Af89E81AcD33B6b8F5CF5cDD961a'},
-                             'celo': '0xb404e5233aB7E426213998C025f05EaBaBD41Da6'}
+                             'core': '0x36e5121618c0Af89E81AcD33B6b8F5CF5cDD961a',
+                             'celo': '0xb404e5233aB7E426213998C025f05EaBaBD41Da6'}}
 
 reversed_nfts_addresses = {'greenfield': {'polygon': "0x25B2e530F4bAbfE6831B7f0801Bf6a59a2911e59"},
                            'zkLightClient': {'bsc': '0x3FA9B338B6e5c5F433AA7E87250cC18808D120Fd',
