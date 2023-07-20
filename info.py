@@ -51,7 +51,8 @@ lzdst_addresses = {'bsc': '0x39dad2E89a213626a99Ae09b808b4A79c0d3EC16',
 
 nft_bridge_addresses = {'bsc': '0xE09828f0DA805523878Be66EA2a70240d312001e',
                         'polygon': '0x2E953a70C37E8CB4553DAe1F5760128237c8820D',
-                        'core': '0x5c5979832a60c17bb06676fa906bedd1a013e18c'}
+                        'core': '0x5c5979832a60c17bb06676fa906bedd1a013e18c',
+                        'celo': '0x24339b7f8d303527C8681382AbD4Ec299757aF63'}
 
 nft_lz_bridge_addresses = {'bsc': '0x3668c325501322CEB5a624E95b9E16A019cDEBe8',
                            'polygon': '0xffdf4fe05899c4bdb1676e958fa9f21c19ecb9d5',
