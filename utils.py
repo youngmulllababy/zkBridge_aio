@@ -152,7 +152,7 @@ class ZkBridge(Help):
             return False
 
     async def balance_and_get_id(self):
-        if self.chain != 'core':
+        if self.chain not in ['core', 'celo']:
             try:
                 api_key = self.moralisapi
                 params = {
