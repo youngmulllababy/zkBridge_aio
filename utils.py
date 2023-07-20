@@ -264,6 +264,9 @@ class ZkBridge(Help):
             else:
                 return self.privatekey, self.address, f'error {self.nft}'
 
+        if self.nft == 'greenfield':
+            return self.privatekey, self.address, f'succesfully minted greenfield'
+
         zkNft = self.w3.eth.contract(address=Web3.to_checksum_address(self.nft_address), abi=zk_nft_abi)
 
         async def approve_nft(gwei=None):
@@ -331,7 +334,6 @@ class ZkBridge(Help):
                         tx = await bridge.functions.transferNFT(*args).build_transaction({
                             'from': self.address,
                             'value': lzfee,
-
                             'nonce': nonce,
                             'maxFeePerGas': int(await self.w3.eth.gas_price),
                             'maxPriorityFeePerGas': int((await self.w3.eth.gas_price) * 0.8)

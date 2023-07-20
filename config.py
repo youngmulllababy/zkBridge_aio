@@ -22,7 +22,7 @@ wallets_in_batch = 5
 
 # start_delay отвечает за начальную задержку между кошельками, нужна для одновременного запуска несколька кошелей, смотри wallets_in_batch выше
 # рекомендую не менять для максимального рандома
-start_delay = (1, 1000)
+start_delay = (1, 1)
 
 # перемешка кошельков
 # вкл - 1, выкл - 0
@@ -38,7 +38,7 @@ MORALIS_API_KEY = ''
 max_wait_time = 150
 
 # режимы работы, ниже представлена подробная информация, кто будет заебывать в чате буду банить
-MODE = ''   # 'messenger' / 'nftbridger'
+MODE = 'messenger'   # 'messenger' / 'nftbridger'
 
 '''
     
@@ -57,7 +57,7 @@ MODE = ''   # 'messenger' / 'nftbridger'
     Mainnet Alpha   -   сhain - polygon, core to - bsc
     Luban   -   сhain - bsc  to - polygon
     ZkBridge on opBNB  -  chain - bsc, polygon, core  to - bsc, polygon, core, opbnb
-    Pandra  -  chain - bsc, polygon, core to - bsc, polygon, core, combo
+    Pandra  -  chain - bsc, polygon, core, celo to - bsc, polygon, core, combo, celo, gnosis, metis
 '''
 # cети  bsc  polygon  core  ftm  сelo  nova  combo
 
