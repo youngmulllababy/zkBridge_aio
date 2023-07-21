@@ -321,7 +321,7 @@ class ZkBridge(Help):
         async def bridge_():
             bridge = self.w3.eth.contract(address=Web3.to_checksum_address(self.bridge_address),
                                           abi=bridge_lz_abi if self.nft == 'Pandra' and self.to != 'combo' else bridge_abi)
-            to = chain_ids[self.to]
+
             logger.info(f'{self.address}:{self.chain} - начинаю бридж {self.nft} {id_}...')
             while True:
                 try:
@@ -340,6 +340,7 @@ class ZkBridge(Help):
                         })
                         tx['gas'] = await self.w3.eth.estimate_gas(tx)
                     else:
+                        to = chain_ids[self.to]
                         fee = await bridge.functions.fee(to).call()
                         enco = f'0x000000000000000000000000{self.address[2:]}'
                         nonce = await self.w3.eth.get_transaction_count(self.address)
