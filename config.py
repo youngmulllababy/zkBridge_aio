@@ -22,7 +22,7 @@ wallets_in_batch = 5
 
 # start_delay отвечает за начальную задержку между кошельками, нужна для одновременного запуска несколька кошелей, смотри wallets_in_batch выше
 # рекомендую не менять для максимального рандома
-start_delay = (1, 1)
+start_delay = (1, 1000)
 
 # перемешка кошельков
 # вкл - 1, выкл - 0
@@ -38,7 +38,7 @@ MORALIS_API_KEY = ''
 max_wait_time = 150
 
 # режимы работы, ниже представлена подробная информация, кто будет заебывать в чате буду банить
-MODE = 'messenger'   # 'messenger' / 'nftbridger'
+MODE = 'nftbridger'   # 'messenger' / 'nftbridger'
 
 '''
     
@@ -57,18 +57,20 @@ MODE = 'messenger'   # 'messenger' / 'nftbridger'
     Mainnet Alpha   -   сhain - polygon, core to - bsc
     Luban   -   сhain - bsc  to - polygon
     ZkBridge on opBNB  -  chain - bsc, polygon, core  to - bsc, polygon, core, opbnb
-    Pandra  -  chain - bsc, polygon, core, celo to - bsc, polygon, core, combo, celo, gnosis, metis
+    Pandra  -  chain - bsc, polygon, core, celo to - bsc, polygon, core, combo, celo, gnosis, metis, mantle
+    
 '''
-# cети  bsc  polygon  core  ftm  сelo  nova  combo
+
+# cети  bsc  polygon  core  ftm  celo  nova  combo
 
 # из какой сети минтить и бриджить / отправлять сообщение
-chain = ''
+chain = 'bsc'
 
 # в какую сеть бриджить / отправлять сообщение
 # либо 'определенная сеть' либо ['сеть', 'сеть'] для выбора рандомной сети (если это позволяет настройка выше), не читаешь гайд получаешь бан в чате
-to = ''
+to = 'mantle'
 
 # выбор нфт для минта и бриджа
 # список нфт 'greenfield' 'zkLightClient' 'Mainnet Alpha' 'Luban' 'ZkBridge on opBNB', 'Pandra'
-nft = ''
+nft = 'Pandra'
 

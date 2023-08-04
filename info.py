@@ -8,6 +8,7 @@ stargate_ids = {'bsc': 102,
                 'gnosis': 145,
                 'metis': 151,
                 'polygon': 109,
+                'mantle': 181,
                 'ftm': 112,
                 'nova': 175,
                 'mbeam': 126,
@@ -91,3 +92,4 @@ reversed_nfts_addresses = {'greenfield': {'polygon': "0x25B2e530F4bAbfE6831B7f08
                                              'polygon': '0x20a4dFCe37388a6f5a713389f079B333EC27F7D1'},
                            'Mainnet Alpha': {'bsc': '0x9194EDA0BDe962A013B890184e212462650FEe8a'},
                            'Luban': {'polygon': '0x952Ba02590b50e2e80801F27a2417aB05eFE564b'}}
+

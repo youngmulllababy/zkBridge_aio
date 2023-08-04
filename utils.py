@@ -218,7 +218,6 @@ class ZkBridge(Help):
                     sign = self.account.sign_transaction(tx)
                     hash = await self.w3.eth.send_raw_transaction(sign.rawTransaction)
                     status = await self.check_status_tx(hash)
-                    await self.sleep_indicator(5)
                     if status == 1:
                         logger.success(
                             f'{self.address}:{self.chain} - успешно заминтил {self.nft} : {scans[self.chain]}{self.w3.to_hex(hash)}...')
@@ -294,7 +293,6 @@ class ZkBridge(Help):
                         sign = self.account.sign_transaction(tx)
                         hash = await self.w3.eth.send_raw_transaction(sign.rawTransaction)
                         status = await self.check_status_tx(hash)
-                        await self.sleep_indicator(5)
                         if status == 1:
                             logger.success(
                                 f'{self.address}:{self.chain} - успешно апрувнул {self.nft} {id_} : {scans[self.chain]}{self.w3.to_hex(hash)}...')
@@ -329,7 +327,8 @@ class ZkBridge(Help):
                         nonce = await self.w3.eth.get_transaction_count(self.address)
                         await asyncio.sleep(2)
                         args = Web3.to_checksum_address(self.nft_address), id_, stargate_ids[
-                            self.to], self.address, '0x000100000000000000000000000000000000000000000000000000000000001b7740'
+                            self.to], self.address, '0x000100000000000000000000000000000000000000000000000000000000001b7740' if self.to != 'mantle'\
+                            else '0x00010000000000000000000000000000000000000000000000000000000000055730'
                         lzfee = (await bridge.functions.estimateFee(*args).call())
                         tx = await bridge.functions.transferNFT(*args).build_transaction({
                             'from': self.address,
@@ -344,7 +343,6 @@ class ZkBridge(Help):
                         fee = await bridge.functions.fee(to).call()
                         enco = f'0x000000000000000000000000{self.address[2:]}'
                         nonce = await self.w3.eth.get_transaction_count(self.address)
-                        await asyncio.sleep(2)
                         tx = await bridge.functions.transferNFT(
                             Web3.to_checksum_address(self.nft_address), id_, to,
                             enco).build_transaction({
@@ -365,7 +363,6 @@ class ZkBridge(Help):
                     sign = self.account.sign_transaction(tx)
                     hash = await self.w3.eth.send_raw_transaction(sign.rawTransaction)
                     status = await self.check_status_tx(hash)
-                    await self.sleep_indicator(5)
                     if status == 1:
                         logger.success(
                             f'{self.address}:{self.chain} - успешно бриджанул {self.nft} {id_} в {self.to}: {scans[self.chain]}{self.w3.to_hex(hash)}...')
@@ -609,7 +606,6 @@ class ZkMessage(Help):
                 sign = self.account.sign_transaction(tx)
                 hash_ = await self.w3.eth.send_raw_transaction(sign.rawTransaction)
                 status = await self.check_status_tx(hash_)
-                await self.sleep_indicator(5)
                 if status == 1:
                     logger.success(
                         f'{self.address}:{self.chain} - успешно отправил сообщение {message} в {self.to} : {self.scan}{self.w3.to_hex(hash_)}...')
