@@ -56,6 +56,11 @@ async def main():
                 zk = ZkMessage(key, chain, to, DELAY, proxy)
                 tasks.append(zk.send_msg())
 
+            if MODE == 'anniversary':
+                logger.info('Запущен режим клейма 5 нфт Anniversary...')
+                zk = Anniversary(key, DELAY, MORALIS_API_KEY, proxy)
+                tasks.append(zk.do_anniversary_tasks())
+
         res = await asyncio.gather(*tasks)
 
         for res_ in res:
@@ -69,6 +74,7 @@ async def main():
     print(f'\n{" " * 32}автор - https://t.me/iliocka{" " * 32}\n')
     print(f'\n{" " * 32}donate - EVM 0xFD6594D11b13C6b1756E328cc13aC26742dBa868{" " * 32}\n')
     print(f'\n{" " * 32}donate - trc20 TMmL915TX2CAPkh9SgF31U4Trr32NStRBp{" " * 32}\n')
+
 
 
 if __name__ == '__main__':

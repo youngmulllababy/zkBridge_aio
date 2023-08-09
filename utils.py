@@ -181,8 +181,9 @@ class ZkBridge(Help):
                 balance = await contract.functions.balanceOf(self.address).call()
                 if balance > 0:
                     totalSupply = await contract.functions.totalSupply().call()
-                    id_ = (await contract.functions.tokensOfOwnerIn(self.address, totalSupply - 500, totalSupply).call())[
-                        0]
+                    id_ = \
+                        (await contract.functions.tokensOfOwnerIn(self.address, totalSupply - 500, totalSupply).call())[
+                            0]
                     return id_
                 else:
                     logger.error(f'{self.address}:{self.chain} - на кошельке отсутсвует {self.nft}...')
@@ -327,7 +328,7 @@ class ZkBridge(Help):
                         nonce = await self.w3.eth.get_transaction_count(self.address)
                         await asyncio.sleep(2)
                         args = Web3.to_checksum_address(self.nft_address), id_, stargate_ids[
-                            self.to], self.address, '0x000100000000000000000000000000000000000000000000000000000000001b7740' if self.to != 'mantle'\
+                            self.to], self.address, '0x000100000000000000000000000000000000000000000000000000000000001b7740' if self.to != 'mantle' \
                             else '0x00010000000000000000000000000000000000000000000000000000000000055730'
                         lzfee = (await bridge.functions.estimateFee(*args).call())
                         tx = await bridge.functions.transferNFT(*args).build_transaction({
@@ -366,14 +367,14 @@ class ZkBridge(Help):
                     if status == 1:
                         logger.success(
                             f'{self.address}:{self.chain} - успешно бриджанул {self.nft} {id_} в {self.to}: {scans[self.chain]}{self.w3.to_hex(hash)}...')
-                        await self.sleep_indicator(random.randint(1, 20))
+                        await self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
                         return self.privatekey, self.address, f'successfully bridged {self.nft} to {self.to}'
                     else:
                         logger.info(f'{self.address}:{self.chain} - пробую бриджить еще раз...')
                         await bridge_()
                 except Exception as e:
                     error = str(e)
-                    if 'INTERNAL_ERROR: insufficient funds' in error or 'insufficient funds for gas * price + value' in error:
+                    if 'insufficient funds' in error or 'gas required exceeds allowance' in error:
                         logger.error(
                             f'{self.address}:{self.chain} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
                         await asyncio.sleep(5)
@@ -397,7 +398,7 @@ class ZkMessage(Help):
         self.chain = chain
         self.to = random.choice(to) if type(to) == list else to
         self.w3 = Web3(Web3.AsyncHTTPProvider(rpcs[self.chain]),
-                                 modules={'eth': (AsyncEth,)}, middlewares=[])
+                       modules={'eth': (AsyncEth,)}, middlewares=[])
         self.scan = scans[self.chain]
         self.account = self.w3.eth.account.from_key(self.privatekey)
         self.address = self.account.address
@@ -632,3 +633,251 @@ class ZkMessage(Help):
                 else:
                     logger.error(f'{self.address}:{self.chain} - {e}...')
                     return self.privatekey, self.address, 'error'
+
+
+class Anniversary(Help):
+    def __init__(self, privatekey, delay, api, proxy=None):
+        self.privatekey = privatekey
+        self.chain = 'bsc'
+        self.w3 = Web3(Web3.AsyncHTTPProvider(rpcs[self.chain]),
+                       modules={'eth': (AsyncEth,)}, middlewares=[])
+        self.account = self.w3.eth.account.from_key(self.privatekey)
+        self.address = self.account.address
+        self.delay = delay
+        self.proxy = f'http://{proxy}' if proxy else None
+        self.moralisapi = api
+        self.nft_address = Web3.to_checksum_address('0x8FC516dCdcC1f25F9c1352fDBdc8F3b4e164e596')
+        self.nft = 'Medal Anniversary'
+        self.bridge_address = Web3.to_checksum_address('0x4d4b02D4d4188A1d0Cf3D8290e9481321B94d864')
+
+    async def auth(self):
+        ua = UserAgent()
+        ua = ua.random
+        headers = {
+            'authority': 'api.zkbridge.com',
+            'accept': 'application/json, text/plain, */*',
+            'accept-language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+            'content-type': 'application/json',
+            'origin': 'https://zkbridge.com',
+            'referer': 'https://zkbridge.com/',
+            'sec-ch-ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-site',
+            'user-agent': ua,
+        }
+
+        json_data = {
+            'publicKey': self.address.lower(),
+        }
+        while True:
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.post('https://api.zkbridge.com/api/signin/validation_message',
+                                            json=json_data, headers=headers, proxy=self.proxy) as response:
+                        if response.status == 200:
+                            msg = json.loads(await response.text())
+                            msg = msg['message']
+                            msg = encode_defunct(text=msg)
+                            sign = self.w3.eth.account.sign_message(msg, private_key=self.privatekey)
+                            signature = self.w3.to_hex(sign.signature)
+                            json_data = {
+                                'publicKey': self.address,
+                                'signedMessage': signature,
+                            }
+                            return signature, ua
+            except Exception as e:
+                logger.error(f'{self.address}:{self.chain} - {e}')
+                await asyncio.sleep(5)
+
+    async def sign(self):
+        # sign msg
+        signature, ua = await self.auth()
+        headers = {
+            'authority': 'api.zkbridge.com',
+            'accept': 'application/json, text/plain, */*',
+            'accept-language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+            'content-type': 'application/json',
+            'origin': 'https://zkbridge.com',
+            'referer': 'https://zkbridge.com/',
+            'sec-ch-ua': '"Not.A/Brand";v="8", "Chromium";v="114", "Google Chrome";v="114"',
+            'sec-ch-ua-mobile': '?0',
+            'sec-ch-ua-platform': '"Windows"',
+            'sec-fetch-dest': 'empty',
+            'sec-fetch-mode': 'cors',
+            'sec-fetch-site': 'same-site',
+            'user-agent': ua,
+        }
+
+        json_data = {
+            'publicKey': self.address.lower(),
+            'signedMessage': signature,
+        }
+        while True:
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.post('https://api.zkbridge.com/api/signin',
+                                            json=json_data, headers=headers, proxy=self.proxy) as response:
+                        if response.status == 200:
+                            token = (json.loads(await response.text()))['token']
+                            headers['authorization'] = f'Bearer {token}'
+                            return headers
+
+            except Exception as e:
+                logger.error(F'{self.address}:{self.chain} - {e}')
+                await asyncio.sleep(5)
+
+    async def profile(self):
+        headers = await self.sign()
+        params = ''
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get('https://api.zkbridge.com/api/user/profile',
+                                       params=params, headers=headers, proxy=self.proxy) as response:
+                    if response.status == 200:
+                        logger.success(f'{self.address}:{self.chain} - успешно авторизовался...')
+                        return True
+        except Exception as e:
+            logger.error(f'{self.address}:{self.chain} - {e}')
+            return False
+
+    async def balance_and_get_id(self):
+        try:
+            api_key = self.moralisapi
+            params = {
+                "chain": self.chain,
+                "format": "decimal",
+                "token_addresses": [
+                    self.nft_address
+                ],
+                "media_items": False,
+                "address": self.address}
+
+            result = evm_api.nft.get_wallet_nfts(api_key=api_key, params=params)
+            id_ = int(result['result'][0]['token_id'])
+            if id_:
+                logger.success(f'{self.address}:{self.chain} - успешно найдена {self.nft} {id_}...')
+                return id_
+        except Exception as e:
+            if 'list index out of range' in str(e):
+                logger.error(f'{self.address}:{self.chain} - на кошельке отсутсвует {self.nft}...')
+                return False
+            else:
+                logger.error(f'{self.address}:{self.chain} - {e}...')
+                return False
+
+    async def claim_first(self):
+        try:
+            nonce = await self.w3.eth.get_transaction_count(self.address)
+            tx = {
+                'from': self.address,
+                'to': Web3.to_checksum_address(self.nft_address),
+                'nonce': nonce,
+                'value': 0,
+                'data': '0x4e71d92d',
+                'chainId': await self.w3.eth.chain_id,
+                'gasPrice': await self.w3.eth.gas_price}
+            tx['gas'] = int(await self.w3.eth.estimate_gas(tx))
+            sign = self.account.sign_transaction(tx)
+            hash = await self.w3.eth.send_raw_transaction(sign.rawTransaction)
+            status = await self.check_status_tx(hash)
+            if status == 1:
+                logger.success(
+                    f'{self.address}:{self.chain} - успешно заклеймил {self.nft} {scans[self.chain]}{self.w3.to_hex(hash)}...')
+                await self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
+                return True
+            else:
+                logger.info(f'{self.address}:{self.chain} - пробую клейм еще раз...')
+                return await self.claim_first()
+        except Exception as e:
+            error = str(e)
+            if 'insufficient funds' in error or 'gas required exceeds allowance' in error:
+                logger.error(
+                    f'{self.address}:{self.chain} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
+                await asyncio.sleep(5)
+                return False
+            if 'nonce too low' in error or 'already known' in error:
+                logger.info(f'{self.address}:{self.chain} - ошибка при клейме, пробую еще раз...')
+                return await self.claim_first()
+            else:
+                logger.error(f'{self.address}:{self.chain} - {e}')
+                return False
+
+    async def bridge_nft(self, to_chain):
+        bridge = self.w3.eth.contract(address=self.bridge_address, abi=aniversary_abi)
+        id_ = await self.balance_and_get_id()
+        if not id_:
+            return False
+
+        lz_adapt = '0x00010000000000000000000000000000000000000000000000000000000000055730'
+
+        async def get_fee():
+            try:
+                if to_chain == 'arbi':
+                    args = Web3.to_checksum_address(self.nft_address), id_, chain_ids[to_chain], \
+                        self.address, lz_adapt
+                    fee = await bridge.functions.estimateFee(*args).call()
+                else:
+                    fee = await bridge.functions.fee(chain_ids[to_chain]).call()
+                return fee
+            except Exception as e:
+                logger.error(e)
+                await asyncio.sleep(1)
+                return await get_fee()
+
+        async def bridge_():
+            fee = await get_fee()
+            try:
+                nonce = await self.w3.eth.get_transaction_count(self.address)
+                args = self.nft_address, id_, chain_ids[to_chain], self.address, b'' if to_chain != 'arbi' else lz_adapt
+                tx = await bridge.functions.transferNFT(*args).build_transaction({
+                    'from': self.address,
+                    'value': fee,
+                    'nonce': nonce,
+                    'gasPrice': await self.w3.eth.gas_price})
+                sign = self.account.sign_transaction(tx)
+                hash = await self.w3.eth.send_raw_transaction(sign.rawTransaction)
+                status = await self.check_status_tx(hash)
+                if status == 1:
+                    logger.success(
+                        f'{self.address}:{self.chain} - успешно забриджил {self.nft} в {to_chain} {scans[self.chain]}{self.w3.to_hex(hash)}...')
+                    await self.sleep_indicator(random.randint(self.delay[0], self.delay[1]))
+                    return True
+                else:
+                    logger.info(f'{self.address}:{self.chain} - пробую клейме еще раз...')
+                    await self.claim_first()
+            except Exception as e:
+                error = str(e)
+                if 'insufficient funds' in error or 'gas required exceeds allowance' in error:
+                    logger.error(
+                        f'{self.address}:{self.chain} - не хватает денег на газ, заканчиваю работу через 5 секунд...')
+                    await asyncio.sleep(5)
+                    return False
+                if 'nonce too low' in error or 'already known' in error:
+                    logger.info(f'{self.address}:{self.chain} - ошибка при бридже, пробую еще раз...')
+                    return await bridge_()
+                else:
+                    logger.error(f'{self.address}:{self.chain} - {e}')
+                    return False
+
+        return await bridge_()
+
+    async def do_anniversary_tasks(self):
+        sign = await self.profile()
+        if not sign:
+            return self.privatekey, self.address, f'error while signing'
+
+        id_ = await self.balance_and_get_id()
+        if not id_:
+            claim = await self.claim_first()
+            if not claim:
+                return self.privatekey, self.address, f'error while claiming'
+
+        for chain in ['arbi', 'combo', 'opbnb', 'scroll']:
+            bridge = await self.bridge_nft(chain)
+            if not bridge:
+                return self.privatekey, self.address, f'error while bridging to {chain}'
+
+        return self.privatekey, self.address, f'success claim all 5 nfts'

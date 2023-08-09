@@ -29,7 +29,7 @@ start_delay = (1, 1000)
 shuffle_keys = 1
 
 # перерыв между действиями
-DELAY = (1, 100)
+DELAY = (1, 200)
 
 # moralis api key - https://admin.moralis.io/login идем сюда и получаем апи ключ, НУЖЕН DEFAULT KEY!, нужно для нахождения id нфт
 MORALIS_API_KEY = ''
@@ -38,7 +38,7 @@ MORALIS_API_KEY = ''
 max_wait_time = 150
 
 # режимы работы, ниже представлена подробная информация, кто будет заебывать в чате буду банить
-MODE = 'nftbridger'   # 'messenger' / 'nftbridger'
+MODE = ''   # 'messenger' / 'nftbridger' / 'anniversary'
 
 '''
     
@@ -47,30 +47,28 @@ MODE = 'nftbridger'   # 'messenger' / 'nftbridger'
                   to  только в bsc, polygon, nova, ftm, mbeam
                   из CELO в FTM, BSC, POLYGON 
     
+    
     квест на бридж и минт нфт
     nftbridger - для каждой нфт свои чейны, если ошибетесь - работать не будет
     
     данные ниже для работы в режиме nftbridger
 
-    greenfield   -   сhain - bsc  to - polygon
-    zkLightClient   -   сhain - bsc, polygon  to - bsc, polygon
-    Mainnet Alpha   -   сhain - polygon, core to - bsc
-    Luban   -   сhain - bsc  to - polygon
-    ZkBridge on opBNB  -  chain - bsc, polygon, core  to - bsc, polygon, core, opbnb
     Pandra  -  chain - bsc, polygon, core, celo to - bsc, polygon, core, combo, celo, gnosis, metis, mantle
+    
+    anniversary  -  собирает все 5 нфт
     
 '''
 
-# cети  bsc  polygon  core  ftm  celo  nova  combo
+# cети  bsc  polygon  core  ftm  celo  nova  combo mantle
 
 # из какой сети минтить и бриджить / отправлять сообщение
-chain = 'bsc'
+chain = 'polygon'
 
 # в какую сеть бриджить / отправлять сообщение
 # либо 'определенная сеть' либо ['сеть', 'сеть'] для выбора рандомной сети (если это позволяет настройка выше), не читаешь гайд получаешь бан в чате
 to = 'mantle'
 
 # выбор нфт для минта и бриджа
-# список нфт 'greenfield' 'zkLightClient' 'Mainnet Alpha' 'Luban' 'ZkBridge on opBNB', 'Pandra'
+# список нфт 'Pandra'
 nft = 'Pandra'
 
