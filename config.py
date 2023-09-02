@@ -59,7 +59,7 @@ MODE = ''   # 'messenger' / 'nftbridger' / 'anniversary'
     
 '''
 
-# cети  bsc  polygon  core  ftm  celo  nova  combo mantle
+# cети  bsc  polygon  core  ftm  celo  nova  combo mantle taiko
 
 # из какой сети минтить и бриджить / отправлять сообщение
 chain = 'polygon'

@@ -56,7 +56,7 @@ class ZkBridge(Help):
         self.moralisapi = api
         self.nft_address = nfts_addresses[self.nft][self.chain]
         self.bridge_address = nft_lz_bridge_addresses[
-            self.chain] if self.nft == 'Pandra' and self.to != 'combo' else nft_bridge_addresses[self.chain]
+            self.chain] if self.nft == 'Pandra' and self.to not in ('combo', 'taiko') else nft_bridge_addresses[self.chain]
 
     async def auth(self):
         ua = UserAgent()
@@ -319,12 +319,12 @@ class ZkBridge(Help):
 
         async def bridge_():
             bridge = self.w3.eth.contract(address=Web3.to_checksum_address(self.bridge_address),
-                                          abi=bridge_lz_abi if self.nft == 'Pandra' and self.to != 'combo' else bridge_abi)
+                                          abi=bridge_lz_abi if self.nft == 'Pandra' and self.to not in ('combo', 'taiko') else bridge_abi)
 
             logger.info(f'{self.address}:{self.chain} - начинаю бридж {self.nft} {id_}...')
             while True:
                 try:
-                    if self.nft == 'Pandra' and self.to != 'combo':
+                    if self.nft == 'Pandra' and self.to not in ('combo', 'taiko'):
                         nonce = await self.w3.eth.get_transaction_count(self.address)
                         await asyncio.sleep(2)
                         args = Web3.to_checksum_address(self.nft_address), id_, stargate_ids[

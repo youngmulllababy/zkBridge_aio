@@ -28,7 +28,8 @@ chain_ids = {'bsc': 3,
              'opbnb': 116,
              'scroll': 120,
              'combo': 114,
-             'celo': 18}
+             'celo': 18,
+             'taiko': 117}
 
 ids = {'bsc': 56,
        'polygon': 137,
