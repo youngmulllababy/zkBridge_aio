@@ -61,6 +61,11 @@ async def main():
                 zk = Anniversary(key, DELAY, MORALIS_API_KEY, proxy)
                 tasks.append(zk.do_anniversary_tasks())
 
+            if MODE == 'lifeform':
+                logger.info('Запущен режим клейма нфт Lifeform...')
+                lifeform = Lifeform(key, DELAY, MORALIS_API_KEY, proxy)
+                tasks.append(lifeform.do_lifeform_tasks())
+
         res = await asyncio.gather(*tasks)
 
         for res_ in res:

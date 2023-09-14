@@ -38,7 +38,7 @@ MORALIS_API_KEY = ''
 max_wait_time = 150
 
 # режимы работы, ниже представлена подробная информация, кто будет заебывать в чате буду банить
-MODE = ''   # 'messenger' / 'nftbridger' / 'anniversary'
+MODE = 'lifeform'   # 'messenger' / 'nftbridger' / 'anniversary' / 'lifeform'
 
 '''
     
