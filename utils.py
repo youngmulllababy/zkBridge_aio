@@ -1125,4 +1125,4 @@ class Lifeform(Help):
             if not bridge:
                 return self.privatekey, self.address, f'error while bridging to {chain}'
 
-        return self.privatekey, self.address, f'success claim all 5 nfts'
+        return self.privatekey, self.address, f'success claim all nfts'
